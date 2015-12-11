@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/bean/bean.iml" filepath="$PROJECT_DIR$/bean/bean.iml" />
+      <module fileurl="file://$PROJECT_DIR$/bson/bson.iml" filepath="$PROJECT_DIR$/bson/bson.iml" />
+      <module fileurl="file://$PROJECT_DIR$/bson-runtime/bson-runtime.iml" filepath="$PROJECT_DIR$/bson-runtime/bson-runtime.iml" />
+      <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/java-code-gen.iml" filepath="$PROJECT_DIR$/java-code-gen.iml" />
+    </modules>
+  </component>
+</project>
