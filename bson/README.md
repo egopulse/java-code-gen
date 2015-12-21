@@ -15,7 +15,7 @@ public interface TestPojo {
 The processor will generate the codec class as
 
 ```java
-package com.egopulse.gen.bson;
+package com.egopulse.bson;
 
 import com.egopulse.bson.codecs.BeanCodec;
 

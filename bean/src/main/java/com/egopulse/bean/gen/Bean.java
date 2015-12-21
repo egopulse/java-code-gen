@@ -1,4 +1,4 @@
-package com.egopulse.gen.bean;
+package com.egopulse.bean.gen;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

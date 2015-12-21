@@ -1,4 +1,4 @@
-package com.egopulse.gen.bson;
+package com.egopulse.bson.gen;
 
 import com.egopulse.bson.codecs.BeanCodec;
 

@@ -1,4 +1,4 @@
-package com.egopulse.gen.bean;
+package com.egopulse.bson.gen;
 
 import java.lang.Override;
 import java.lang.String;

@@ -1,4 +1,6 @@
-package com.egopulse.gen.bean;
+package com.egopulse.bson.gen;
+
+import com.egopulse.bean.gen.Bean;
 
 import java.util.List;
 import java.util.Set;

@@ -37,7 +37,7 @@ public final class TestPojoBuilder implements Supplier<TestPojo> {
         return this;
     }
     public TestPojoBean build() {
-        return new com.egopulse.gen.bean.TestPojoBean(this._boolean);
+        return new com.egopulse.bson.gen.bean.TestPojoBean(this._boolean);
     }
     public TestPojoBean get() {
         return build();

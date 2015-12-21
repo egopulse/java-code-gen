@@ -1,6 +1,6 @@
-package com.egopulse.gen.bson;
+package com.egopulse.bson.gen;
 
-import com.egopulse.gen.bean.Bean;
+import com.egopulse.bean.gen.Bean;
 
 import java.util.List;
 import java.util.Map;

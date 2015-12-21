@@ -1,6 +1,6 @@
-package com.egopulse.gen.bean;
+package com.egopulse.bean.gen;
 
-import com.egopulse.gen.Models;
+import com.egopulse.bson.gen.Models;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;

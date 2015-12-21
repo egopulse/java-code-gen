@@ -1,4 +1,4 @@
-package com.egopulse.gen.bean;
+package com.egopulse.bean.gen;
 
 import com.google.testing.compile.JavaFileObjects;
 import org.junit.Test;
@@ -13,12 +13,12 @@ public class TestBeanGen {
     @Test
     public void testGen() {
         assert_().about(javaSources())
-                .that(Collections.singletonList(JavaFileObjects.forResource("com/egopulse/gen/bean/TestPojo.java")))
+                .that(Collections.singletonList(JavaFileObjects.forResource("com/egopulse/bean/gen/TestPojo.java")))
                 .processedWith(new BeanAnnoProcessor())
                 .compilesWithoutError()
                 .and()
-                .generatesSources(JavaFileObjects.forResource("com/egopulse/gen/bean/TestPojoBean.java"),
-                        JavaFileObjects.forResource("com/egopulse/gen/bean/TestPojoBuilder.java"),
-                        JavaFileObjects.forResource("com/egopulse/gen/bean/TestPojoPropNameExtractor.java"));
+                .generatesSources(JavaFileObjects.forResource("com/egopulse/bean/gen/TestPojoBean.java"),
+                        JavaFileObjects.forResource("com/egopulse/bean/gen/TestPojoBuilder.java"),
+                        JavaFileObjects.forResource("com/egopulse/bean/gen/TestPojoPropNameExtractor.java"));
     }
 }

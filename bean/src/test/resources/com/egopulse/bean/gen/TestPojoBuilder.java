@@ -1,4 +1,4 @@
-package com.egopulse.gen.bean;
+package com.egopulse.bson.gen;
 
 import java.lang.String;
 import java.util.List;
@@ -77,10 +77,10 @@ public final class TestPojoBuilder implements Supplier<TestPojo> {
     }
 
     public TestPojoBean get() {
-        return new com.egopulse.gen.bean.TestPojoBean(this._boolean, this._byte, this._short, this._int, this._long, this._float, this._double, this._string, this._listString, this._setString);
+        return new com.egopulse.bson.gen.TestPojoBean(this._boolean, this._byte, this._short, this._int, this._long, this._float, this._double, this._string, this._listString, this._setString);
     }
 
     public TestPojoBean build() {
-        return new com.egopulse.gen.bean.TestPojoBean(this._boolean, this._byte, this._short, this._int, this._long, this._float, this._double, this._string, this._listString, this._setString);
+        return new com.egopulse.bson.gen.TestPojoBean(this._boolean, this._byte, this._short, this._int, this._long, this._float, this._double, this._string, this._listString, this._setString);
     }
 }

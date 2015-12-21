@@ -1,4 +1,4 @@
-package com.egopulse.gen.bson;
+package com.egopulse.bson.gen;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

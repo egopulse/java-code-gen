@@ -1,10 +1,7 @@
-package com.egopulse.gen.bson;
+package com.egopulse.bson.gen;
 
+import com.egopulse.bean.gen.BeanInfo;
 import com.egopulse.bson.codecs.BeanCodec;
-import com.egopulse.gen.Generator;
-import com.egopulse.gen.GeneratorException;
-import com.egopulse.gen.Models;
-import com.egopulse.gen.bean.BeanInfo;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
@@ -304,7 +301,7 @@ public class BsonCodecGenerator implements Generator {
         }
 
         decodeMethodBuilder.addCode("    }\n}\n");
-        decodeMethodBuilder.addStatement("reader.readEndDocument();");
+        decodeMethodBuilder.addStatement("reader.readEndDocument()");
 
         if (shouldHaveNonDefaultConstructor) {
             decodeMethodBuilder.addStatement("return builder.build()");
