@@ -1,0 +1,4 @@
+dependencies {
+    compile "com.squareup:javapoet:$javaPoetVersion"
+    testCompile "com.google.testing.compile:compile-testing:$googleCompileTestingVesion"
+}

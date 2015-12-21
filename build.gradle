@@ -1,0 +1,16 @@
+group = 'com.egopulse.gen'
+version = '0.1.0'
+
+subprojects {
+    apply plugin: 'java'
+
+    sourceCompatibility = '1.8'
+
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        testCompile "junit:junit:$junitVersion"
+    }
+}

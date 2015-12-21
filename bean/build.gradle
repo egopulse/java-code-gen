@@ -1,0 +1,4 @@
+dependencies {
+    compile project(':common')
+    testCompile "com.google.testing.compile:compile-testing:$googleCompileTestingVesion"
+}

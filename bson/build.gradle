@@ -1,0 +1,6 @@
+dependencies {
+    compile project(':bean')
+    compile project(':bson-runtime')
+
+    testCompile "com.google.testing.compile:compile-testing:$googleCompileTestingVesion"
+}
