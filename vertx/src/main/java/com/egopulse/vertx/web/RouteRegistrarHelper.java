@@ -101,7 +101,37 @@ public interface RouteRegistrarHelper {
         return stringToObject(clazz, ctx.getBodyAsString());
     }
 
-    <R> void handleResponse(RoutingContext ctx, Class<R> retType, R ret);
+    @SuppressWarnings("unchecked")
+    default <R> void handleResponse(RoutingContext ctx, Class<R> retType, R ret) {
+        if (ret != null) {
+            if (ret instanceof Observable) {
+                ((Observable) ret).subscribe(new Subscriber() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        handleError(ctx, e);
+                    }
+
+                    @Override
+                    public void onNext(Object o) {
+                        if (o != null) {
+                            handleSingleResponse(ctx, (Class) o.getClass(), o);
+                        }
+                    }
+                });
+            } else {
+                handleSingleResponse(ctx, retType, ret);
+            }
+        } else {
+            ctx.next();
+        }
+    }
+
+    <R> void handleSingleResponse(RoutingContext ctx, Class<R> retType, R ret);
 
     void handleError(RoutingContext ctx, Throwable e);
 
