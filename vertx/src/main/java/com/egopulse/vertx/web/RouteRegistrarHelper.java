@@ -8,6 +8,8 @@ import io.vertx.rxjava.core.buffer.Buffer;
 import io.vertx.rxjava.core.http.HttpServerResponse;
 import io.vertx.rxjava.ext.web.RoutingContext;
 import io.vertx.rxjava.ext.web.sstore.SessionStore;
+import rx.Observable;
+import rx.Subscriber;
 
 public interface RouteRegistrarHelper {
     default <T> String objectToString(T val) {
@@ -101,9 +103,10 @@ public interface RouteRegistrarHelper {
 
     <R> void handleResponse(RoutingContext ctx, Class<R> retType, R ret);
 
-    default <R> void handleResponseBody(RoutingContext ctx, Class<R> retType, R ret) {
+    void handleError(RoutingContext ctx, Throwable e);
+
+    default <R> void handleSingleResponseBody(RoutingContext ctx, Class<R> clazz,  R ret) {
         HttpServerResponse resp = ctx.response();
-        resp.putHeader("content-type", ctx.getAcceptableContentType());
         if (ret != null) {
             if (ret instanceof String) {
                 resp.write((String) ret);
@@ -117,6 +120,39 @@ public interface RouteRegistrarHelper {
                 resp.write(objectToString(ret));
             }
         }
-        resp.end();
+    }
+
+    @SuppressWarnings("unchecked")
+    default <R> void handleResponseBody(RoutingContext ctx, Class<R> clazz, R ret) {
+        HttpServerResponse resp = ctx.response();
+        if (ret != null) {
+            resp.putHeader("content-type", ctx.getAcceptableContentType());
+            if (ret instanceof Observable) {
+                ((Observable) ret).subscribe(new Subscriber() {
+                    @Override
+                    public void onCompleted() {
+                        resp.end();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        handleError(ctx, e);
+                    }
+
+                    @Override
+                    public void onNext(Object o) {
+                        if (o != null) {
+                            handleSingleResponseBody(ctx, (Class) o.getClass(), o);
+                        }
+                    }
+                });
+            } else {
+                handleSingleResponseBody(ctx, clazz, ret);
+                resp.end();
+            }
+        } else {
+            resp.end();
+        }
+
     }
 }

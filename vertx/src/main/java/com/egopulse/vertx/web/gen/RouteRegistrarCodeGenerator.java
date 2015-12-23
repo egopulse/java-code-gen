@@ -110,6 +110,7 @@ public class RouteRegistrarCodeGenerator implements Generator {
 
             // Handler method
             registerMethodBuilder.addCode("  $T handler = ctx -> {\n", ParameterizedTypeName.get(Handler.class, RoutingContext.class));
+            registerMethodBuilder.addCode("    try {\n");
 
             // Target method call
             if (methodType.getKind() != TypeKind.VOID) {
@@ -141,7 +142,12 @@ public class RouteRegistrarCodeGenerator implements Generator {
                 registerMethodBuilder.addStatement("    ctx.next()");
             }
             //End the handler method
-            registerMethodBuilder.addCode("  };\n");
+            registerMethodBuilder.addCode(
+                    "    } catch (Throwable t) {;\n" +
+                    "      helper.handleError(ctx, t);\n" +
+                    "    };\n" +
+                    "  };\n");
+
 
             Blocking blocking = method.getAnnotation(Blocking.class);
             if (defaultBlocking != null || blocking != null) {
