@@ -78,7 +78,6 @@ public abstract class BeanCodec<T> implements Codec<T> {
         List<I> list = new ArrayList<>();
         reader.readStartArray();
         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
-            BsonType bsonType = reader.getCurrentBsonType();
             list.add(codec.decode(reader, ctx));
         }
         reader.readEndArray();

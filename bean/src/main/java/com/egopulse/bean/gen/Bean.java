@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Mark an interface that {@link BeanAnnoProcessor} should generate implementation and builder class for it
+ * Mark an interface that {@link BeanProcessor} should generate implementation and builder class for it
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)

@@ -4,8 +4,8 @@ import com.egopulse.bson.gen.Generator;
 import com.egopulse.bson.gen.Models;
 import com.egopulse.bson.gen.TypeModelAnnotationProcessor;
 
-public class BeanAnnoProcessor extends TypeModelAnnotationProcessor {
-    public BeanAnnoProcessor() {
+public class BeanProcessor extends TypeModelAnnotationProcessor {
+    public BeanProcessor() {
         super(Bean.class);
     }
 

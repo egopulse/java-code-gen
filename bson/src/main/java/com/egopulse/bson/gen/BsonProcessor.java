@@ -1,7 +1,7 @@
 package com.egopulse.bson.gen;
 
-public class BsonAnnoProcessor extends TypeModelAnnotationProcessor {
-    protected BsonAnnoProcessor() {
+public class BsonProcessor extends TypeModelAnnotationProcessor {
+    protected BsonProcessor() {
         super(Bson.class);
     }
 

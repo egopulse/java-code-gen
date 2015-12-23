@@ -18,11 +18,11 @@
     <orderEntry type="module" module-name="bson-runtime" />
     <orderEntry type="library" scope="TEST" name="Gradle: junit:junit:4.12" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.hamcrest:hamcrest-core:1.3" level="project" />
-    <orderEntry type="library" name="Gradle: com.squareup:javapoet:1.4.0" level="project" />
     <orderEntry type="library" name="Gradle: org.mongodb:bson:3.2.0" level="project" />
     <orderEntry type="module" module-name="bean" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.google.testing.compile:compile-testing:0.8" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.google.truth:truth:0.25" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.google.guava:guava:17.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.squareup:javapoet:1.4.0" level="project" />
   </component>
 </module>

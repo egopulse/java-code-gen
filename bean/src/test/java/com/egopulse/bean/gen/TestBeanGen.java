@@ -14,7 +14,7 @@ public class TestBeanGen {
     public void testGen() {
         assert_().about(javaSources())
                 .that(Collections.singletonList(JavaFileObjects.forResource("com/egopulse/bean/gen/TestPojo.java")))
-                .processedWith(new BeanAnnoProcessor())
+                .processedWith(new BeanProcessor())
                 .compilesWithoutError()
                 .and()
                 .generatesSources(JavaFileObjects.forResource("com/egopulse/bean/gen/TestPojoBean.java"),

@@ -1,13 +1,8 @@
-package com.egopulse.gen;
+package com.egopulse.bson.gen;
 
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.PackageElement;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
+import javax.lang.model.element.*;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
@@ -16,6 +11,7 @@ import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,6 +54,15 @@ public class Models {
 
     public static boolean isMethod(Element element) {
         return element.getKind() == ElementKind.METHOD;
+    }
+
+    public static boolean isPublicNonStatic(Element element) {
+        Set<Modifier> modifiers = element.getModifiers();
+        return modifiers.contains(Modifier.PUBLIC) && !modifiers.contains(Modifier.STATIC);
+    }
+
+    public static <T extends Annotation> boolean isAnnotatedWith(Element element, Class<T> annotationClass) {
+        return element.getAnnotation(annotationClass) != null;
     }
 
     public static boolean isField(Element element) {
@@ -204,6 +209,13 @@ public class Models {
     public List<ExecutableElement> getMethods(TypeElement typeElement) {
         return elemsUtil.getAllMembers(typeElement).stream()
                 .filter(Models::isMethod).filter(this::isNotBelongToObject)
+                .map(elem -> (ExecutableElement) elem)
+                .collect(Collectors.toList());
+    }
+
+    public <T extends Annotation> List<ExecutableElement> getPublicNonStaticAnnotatedMethod(TypeElement typeElement, Class<T> annotationClass) {
+        return elemsUtil.getAllMembers(typeElement).stream()
+                .filter(Models::isMethod).filter(m -> isNotBelongToObject(m) && isPublicNonStatic(m) && isAnnotatedWith(m, annotationClass))
                 .map(elem -> (ExecutableElement) elem)
                 .collect(Collectors.toList());
     }

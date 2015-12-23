@@ -1,4 +1,4 @@
-package com.egopulse.gen;
+package com.egopulse.bson.gen;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
@@ -17,12 +17,14 @@ import java.util.stream.Collectors;
  * annotated {@link TypeElement}
  */
 public abstract class TypeModelAnnotationProcessor extends AbstractProcessor {
-    private final Class<? extends Annotation> annotationType;
+    private final Class<? extends  Annotation>[] annotationTypes;
     private Models models;
     private Filer filer;
+    private Generator generator;
 
-    protected TypeModelAnnotationProcessor(Class<? extends Annotation> annotationType) {
-        this.annotationType = annotationType;
+    @SafeVarargs
+    protected TypeModelAnnotationProcessor(Class<? extends Annotation>... annotationTypes) {
+        this.annotationTypes = annotationTypes;
     }
 
     @Override
@@ -30,12 +32,15 @@ public abstract class TypeModelAnnotationProcessor extends AbstractProcessor {
         super.init(processingEnv);
         models = new Models(processingEnv);
         filer = processingEnv.getFiler();
+        generator = createGenerator(models);
     }
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {
         Set<String> ret = new HashSet<>();
-        ret.add(annotationType.getName());
+        for (Class<? extends Annotation> type : annotationTypes) {
+            ret.add(type.getName());
+        }
         return ret;
     }
 
@@ -46,25 +51,31 @@ public abstract class TypeModelAnnotationProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        List<TypeElement> typeElems = roundEnv.getElementsAnnotatedWith(annotationType).stream()
-                .filter(elem -> elem instanceof TypeElement)
-                .map(elem -> (TypeElement) elem)
-                .collect(Collectors.toList());
-        Generator generator = createGenerator(models);
-        for (TypeElement typeElem : typeElems) {
+        if (roundEnv.processingOver()) {
             try {
-                generator.generate(typeElem, filer);
-            } catch (GeneratorException e) {
-                e.printError(models);
+                generator.generateLast(filer);
             } catch (Throwable t) {
-                models.error(typeElem, t);
+                models.error(null, t);
+            }
+        } else {
+            for (Class<? extends Annotation> annotationType : annotationTypes) {
+                List<TypeElement> typeElems = roundEnv.getElementsAnnotatedWith(annotationType).stream()
+                        .filter(elem -> elem instanceof TypeElement)
+                        .map(elem -> (TypeElement) elem)
+                        .collect(Collectors.toList());
+
+                for (TypeElement typeElem : typeElems) {
+                    try {
+                        generator.generate(typeElem, filer);
+                    } catch (GeneratorException e) {
+                        e.printError(models);
+                    } catch (Throwable t) {
+                        models.error(typeElem, t);
+                    }
+                }
             }
         }
-        try {
-            generator.generateLast(filer);
-        } catch (Throwable t) {
-            models.error(null, t);
-        }
+
         return true;
     }
 

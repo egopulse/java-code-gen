@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Mark a bean class or interface so {@link BsonAnnoProcessor} will generate BSON codec for it, in the case of
+ * Mark a bean class or interface so {@link BsonProcessor} will generate BSON codec for it, in the case of
  * interface the processor assumes there are implementation and builder classes ready
  */
 @Target(ElementType.TYPE)

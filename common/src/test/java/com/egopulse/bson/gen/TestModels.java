@@ -1,4 +1,4 @@
-package com.egopulse.gen;
+package com.egopulse.bson.gen;
 
 import com.google.testing.compile.JavaFileObjects;
 import org.junit.Assert;

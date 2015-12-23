@@ -1,0 +1,6 @@
+dependencies {
+    optional project(':common')
+    compile project(':web-annotation')
+
+    testCompile "com.google.testing.compile:compile-testing:$googleCompileTestingVesion"
+}

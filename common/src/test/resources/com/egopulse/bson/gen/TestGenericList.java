@@ -1,6 +1,6 @@
-package com.egopulse.gen;
+package com.egopulse.bson.gen;
 
-import com.egopulse.gen.TestModels.TestAnnotation;
+import com.egopulse.bson.gen.TestModels.TestAnnotation;
 
 import java.util.Collections;
 import java.util.List;

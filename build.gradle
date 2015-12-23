@@ -1,10 +1,31 @@
-group = 'com.egopulse.gen'
-version = '0.1.0'
+buildscript {
+    repositories {
+        jcenter()
+        maven { url 'http://repo.spring.io/plugins-release' }
+    }
+    dependencies {
+        classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.4'
+    }
+}
+
+task(binTrayUpload, group: 'Publishing tasks', description: 'Publish all artifacts to Bintray') << {
+    println 'Publish all artifacts to Bintray'
+}
 
 subprojects {
     apply plugin: 'java'
+    apply plugin: 'maven'
+    apply plugin: 'com.jfrog.bintray'
+    apply plugin: 'propdeps'
+    apply plugin: 'propdeps-maven'
+    apply plugin: 'propdeps-idea'
+
+    group = 'com.egopulse.gen'
+    version = '0.1.0'
 
     sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
 
     repositories {
         jcenter()
@@ -13,4 +34,29 @@ subprojects {
     dependencies {
         testCompile "junit:junit:$junitVersion"
     }
+
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    artifacts {
+        archives sourcesJar
+    }
+
+    bintray {
+        user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+        key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
+        configurations = ['archives']
+        publish = false
+        pkg {
+            repo = 'maven'
+            name =  "${project.group}.${project.name}"
+            userOrg = 'egopulse'
+            licenses = ['Apache-2.0']
+            vcsUrl = 'https://github.com/egopulse/java-code-gen'
+        }
+    }
+
+    rootProject.tasks.binTrayUpload.dependsOn project.tasks.bintrayUpload
 }

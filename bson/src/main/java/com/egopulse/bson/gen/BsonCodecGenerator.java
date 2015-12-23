@@ -27,9 +27,12 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import java.io.IOException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class BsonCodecGenerator implements Generator {
+    private final List<String> generatedClassNames = new ArrayList<>();
     private final Models models;
     private final TypeMirror objectIdTypeMirror;
     private final TypeMirror bsonBinaryTypeMirror;
@@ -208,11 +211,12 @@ public class BsonCodecGenerator implements Generator {
     public void generate(final TypeElement typeElem, final Filer filer) throws IOException {
         PackageElement packageElem = Models.getPackage(typeElem);
         String packageName = packageElem.getQualifiedName().toString();
-        String beanName = typeElem.getSimpleName().toString();
+        String beanSimpleName = typeElem.getSimpleName().toString();
+        String builderSimpleName = beanSimpleName + "Builder";
         ClassName beanClassName = ClassName.get(typeElem);
         TypeName beanClassTypeName = ParameterizedTypeName.get(classClassName, beanClassName);
         ParameterSpec pojoParamSpec = ParameterSpec.builder(beanClassName, "pojo").addModifiers(Modifier.FINAL).build();
-        TypeSpec.Builder builder = initBuilder(beanName, beanClassName, beanClassTypeName);
+        TypeSpec.Builder builder = initBuilder(beanSimpleName, beanClassName, beanClassTypeName);
         BeanInfo info = BeanInfo.fromType(typeElem, models);
         boolean hasId = false;
         boolean shouldHaveNonDefaultConstructor = info.shouldHaveNonDefaultConstructor();
@@ -225,13 +229,13 @@ public class BsonCodecGenerator implements Generator {
                 .addParameter(bsonReaderParamSpec)
                 .addParameter(decoderCtxParamSpec);
         if (shouldHaveNonDefaultConstructor) {
-            ClassName builderClassName = ClassName.get(packageName, beanName + "Builder");
+            ClassName builderClassName = ClassName.get(packageName, builderSimpleName);
             //BeanBuilder builder = new BeanBuilder();
             decodeMethodBuilder.addStatement("$T builder = new $T()", builderClassName, builderClassName);
         } else {
             if (typeElem.getKind() == ElementKind.INTERFACE) {
                 //BeanBean pojo = new BeanBean();
-                ClassName implClassName = ClassName.get(packageName, beanName + "Bean");
+                ClassName implClassName = ClassName.get(packageName, beanSimpleName + "Bean");
                 decodeMethodBuilder.addStatement("$T pojo = new $T()", implClassName, implClassName);
             } else {
                 //Bean pojo = new Bean();
@@ -313,11 +317,12 @@ public class BsonCodecGenerator implements Generator {
         builder.addMethod(encodeMethodBuilder.build());
         builder.addMethod(decodeMethodBuilder.build());
         JavaFile.builder(packageName, builder.build()).build().writeTo(filer);
+        generatedClassNames.add(packageName + "." + beanSimpleName + "Codec");
     }
 
     @Override
     public void generateLast(Filer filer) throws IOException {
-        //Generate registration class
+        writeServiceNames(BeanCodec.class, filer, generatedClassNames);
     }
 
     private void addPropWriteCode(MethodSpec.Builder builder, TypeElement typeElem, String fieldName, BeanInfo.Property prop) {

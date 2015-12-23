@@ -1,6 +1,6 @@
 package com.egopulse.bson.gen;
 
-import com.egopulse.bean.gen.BeanAnnoProcessor;
+import com.egopulse.bean.gen.BeanProcessor;
 import com.google.testing.compile.JavaFileObjects;
 import org.junit.Test;
 
@@ -15,9 +15,15 @@ public class TestBsonGen {
     public void testBsonGen() {
         assert_().about(javaSources())
                 .that(Collections.singletonList(JavaFileObjects.forResource("com/egopulse/bson/gen/TestPojo.java")))
-                .processedWith(new BeanAnnoProcessor(), new BsonAnnoProcessor())
+                .processedWith(new BeanProcessor(), new BsonProcessor())
                 .compilesWithoutError()
                 .and()
-                .generatesSources(JavaFileObjects.forResource("com/egopulse/bson/gen/TestPojoCodec.java"));
+                .generatesSources(
+                        JavaFileObjects.forResource("com/egopulse/bson/gen/TestPojoCodec.java")
+                )
+                .and()
+                .generatesFiles(
+                        JavaFileObjects.forResource("META-INF/services/com.egopulse.bson.codecs.BeanCodec")
+                );
     }
 }
