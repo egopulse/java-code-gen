@@ -2,5 +2,9 @@ dependencies {
     optional project(':common')
     compile project(':web-annotation')
 
+    compile "io.vertx:vertx-web:$vertxVersion"
+    compile "io.vertx:vertx-core:$vertxVersion"
+    compile "io.vertx:vertx-rx-java:$vertxVersion"
+
     testCompile "com.google.testing.compile:compile-testing:$googleCompileTestingVesion"
 }

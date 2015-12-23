@@ -1,15 +1,22 @@
 package com.egopulse.vertx.web;
 
-import io.vertx.core.buffer.Buffer;
-import io.vertx.core.http.HttpServerResponse;
+
+import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.web.RoutingContext;
-import io.vertx.ext.web.sstore.SessionStore;
+import io.vertx.rxjava.core.buffer.Buffer;
+import io.vertx.rxjava.core.http.HttpServerResponse;
+import io.vertx.rxjava.ext.web.RoutingContext;
+import io.vertx.rxjava.ext.web.sstore.SessionStore;
 
 public interface RouteRegistrarHelper {
-    <T> String objectToString(Class<T> clazz, T val);
+    default <T> String objectToString(T val) {
+        return Json.encode(val);
+    }
 
-    <T> T stringToObject(Class<T> clazz, String val);
+    default <T> T stringToObject(Class<T> clazz, String val) {
+        return Json.decodeValue(val, clazz);
+    }
 
     default void throwMissingValue(String message) {
         throw new RuntimeException(message);
@@ -17,7 +24,9 @@ public interface RouteRegistrarHelper {
 
     SessionStore getSessionStore();
 
-    <T> T getParam(Class<T> clazz, RoutingContext ctx);
+    default <T> T getParam(Class<T> clazz, RoutingContext ctx) {
+        return null;
+    }
 
     @SuppressWarnings("unchecked")
     default <T> T getPathParam(Class<T> clazz, RoutingContext ctx, String name) {
@@ -102,8 +111,10 @@ public interface RouteRegistrarHelper {
                 resp.write((Buffer) ret);
             } else if (ret instanceof JsonObject) {
                 resp.write(((JsonObject) ret).encode());
+            } else if (ret instanceof JsonArray) {
+                resp.write(((JsonArray) ret).encode());
             } else {
-                resp.write(objectToString(retType, ret));
+                resp.write(objectToString(ret));
             }
         }
         resp.end();

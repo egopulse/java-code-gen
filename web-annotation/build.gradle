@@ -1,4 +1,0 @@
-dependencies {
-    compile "io.vertx:vertx-web:$vertxVersion"
-    compile "io.vertx:vertx-core:$vertxVersion"
-}

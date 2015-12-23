@@ -4,9 +4,12 @@ import com.egopulse.vertx.web.RouteRegistrar;
 import com.egopulse.vertx.web.RouteRegistrarHelper;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpMethod;
-import io.vertx.ext.web.Route;
-import io.vertx.ext.web.Router;
-import io.vertx.ext.web.RoutingContext;
+import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.http.HttpServerResponse;
+import io.vertx.ext.web.Session;
+import io.vertx.rxjava.ext.web.Route;
+import io.vertx.rxjava.ext.web.Router;
+import io.vertx.rxjava.ext.web.RoutingContext;
 import java.lang.String;
 
 public class TestResourceRegistrar implements RouteRegistrar<TestResource> {
@@ -32,7 +35,7 @@ public class TestResourceRegistrar implements RouteRegistrar<TestResource> {
             route.consumes("application/json");
             route.order(1000);
             Handler<RoutingContext> handler = ctx -> {
-                TestResource.TestBean ret = target.test2(ctx.session(), ctx.currentRoute(), ctx, ctx.request(), ctx.response());
+                TestResource.TestBean ret = target.test2(helper.getParam(Session.class, ctx), helper.getParam(io.vertx.ext.web.Route.class, ctx), helper.getParam(io.vertx.ext.web.RoutingContext.class, ctx), helper.getParam(HttpServerRequest.class, ctx), helper.getParam(HttpServerResponse.class, ctx));
                 helper.handleResponseBody(ctx, TestResource.TestBean.class, ret);
             };
             route.blockingHandler(handler);

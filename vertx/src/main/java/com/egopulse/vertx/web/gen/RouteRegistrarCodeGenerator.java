@@ -1,7 +1,6 @@
 package com.egopulse.vertx.web.gen;
 
 import com.egopulse.bson.gen.Generator;
-import com.egopulse.bson.gen.GeneratorException;
 import com.egopulse.bson.gen.Models;
 import com.egopulse.vertx.web.RouteRegistrarHelper;
 import com.egopulse.vertx.web.RouteRegistrar;
@@ -26,12 +25,13 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import io.vertx.core.Handler;
-import io.vertx.core.http.HttpServerRequest;
-import io.vertx.core.http.HttpServerResponse;
-import io.vertx.ext.web.Route;
-import io.vertx.ext.web.Router;
-import io.vertx.ext.web.RoutingContext;
-import io.vertx.ext.web.Session;
+import io.vertx.rxjava.core.http.HttpServerRequest;
+import io.vertx.rxjava.core.http.HttpServerResponse;
+import io.vertx.rxjava.ext.web.Route;
+import io.vertx.rxjava.ext.web.Router;
+import io.vertx.rxjava.ext.web.RoutingContext;
+import io.vertx.rxjava.ext.web.Session;
+
 
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.ExecutableElement;
