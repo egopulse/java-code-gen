@@ -73,6 +73,18 @@ public interface RouteRegistrarHelper {
     }
 
     @SuppressWarnings("unchecked")
+    default <T> T getSessionValue(Class<T> clazz, RoutingContext ctx, String name, boolean required, String defaultVal) {
+        T val = ctx.session().get(name);
+        if (required && val == null) {
+            throwMissingValue(String.format("No session value %s", name));
+        }
+        if (val == null && defaultVal != null) {
+            val = stringToObject(clazz, defaultVal);
+        }
+        return val;
+    }
+
+    @SuppressWarnings("unchecked")
     default <T> T getReqHeader(Class<T> clazz, RoutingContext ctx, String name, boolean required, String defaultVal) {
         String val = ctx.request().getHeader(name);
         if (required && val == null) {

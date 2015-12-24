@@ -18,8 +18,8 @@ public class TestResourceRegistrar implements RouteRegistrar<TestResource> {
         {
             Route route = router.route();
             route.path("/api/test/:pathParam");
-            route.method(HttpMethod.POST);
             route.method(HttpMethod.GET);
+            route.method(HttpMethod.POST);
             route.produces("application/json");
             Handler<RoutingContext> handler = ctx -> {
                 try {
@@ -69,7 +69,7 @@ public class TestResourceRegistrar implements RouteRegistrar<TestResource> {
             route.produces("application/json");
             Handler<RoutingContext> handler = ctx -> {
                 try {
-                    String ret = target.test3Delete();
+                    String ret = target.test3Delete(helper.getSessionValue(String.class, ctx, "sessionValue", true, null));
                     helper.handleResponseBody(ctx, String.class, ret);
                 } catch (Throwable t) {;
                     helper.handleError(ctx, t);

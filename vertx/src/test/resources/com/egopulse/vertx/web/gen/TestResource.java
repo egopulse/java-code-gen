@@ -12,6 +12,7 @@ import com.egopulse.web.annotation.PathParam;
 import com.egopulse.web.annotation.RequestParam;
 import com.egopulse.web.annotation.Restful;
 import com.egopulse.web.annotation.RouteMapping;
+import com.egopulse.web.annotation.SessionValue;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.Route;
@@ -42,7 +43,7 @@ public class TestResource {
 
     @Method(HttpMethod.DELETE)
     @Path("/test3")
-    public String test3Delete() {
+    public String test3Delete(@SessionValue String sessionValue) {
         return "bbbb";
     }
 

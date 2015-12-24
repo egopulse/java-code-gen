@@ -23,6 +23,7 @@ import com.egopulse.web.annotation.RequestBody;
 import com.egopulse.web.annotation.RequestHeader;
 import com.egopulse.web.annotation.RequestParam;
 import com.egopulse.web.annotation.RouteMapping;
+import com.egopulse.web.annotation.SessionValue;
 import com.egopulse.web.annotation.TRACE;
 import com.egopulse.web.annotation.ValueConstants;
 import com.squareup.javapoet.ClassName;
@@ -142,9 +143,9 @@ class RouteRegistrarCodeGenerator implements Generator {
 
             // Target method call
             if (methodType.getKind() != TypeKind.VOID) {
-                registerMethodBuilder.addCode("    $T ret = target.$L(", methodTypeName, method.getSimpleName().toString());
+                registerMethodBuilder.addCode("      $T ret = target.$L(", methodTypeName, method.getSimpleName().toString());
             } else {
-                registerMethodBuilder.addCode("    target.$L(", method.getSimpleName().toString());
+                registerMethodBuilder.addCode("      target.$L(", method.getSimpleName().toString());
             }
             boolean firstParam = true;
             for (VariableElement param : method.getParameters()) {
@@ -162,12 +163,12 @@ class RouteRegistrarCodeGenerator implements Generator {
             if (methodType.getKind() != TypeKind.VOID) {
                 boolean responseBody = defaultInfo.isResponseBody() || methodRouteMappingInfo.isResponseBody();
                 if (responseBody) {
-                    registerMethodBuilder.addStatement("    helper.handleResponseBody(ctx, $T.class, ret)", erasureMethodType);
+                    registerMethodBuilder.addStatement("      helper.handleResponseBody(ctx, $T.class, ret)", erasureMethodType);
                 } else {
-                    registerMethodBuilder.addStatement("    helper.handleResponse(ctx, $T.class, ret)", erasureMethodType);
+                    registerMethodBuilder.addStatement("      helper.handleResponse(ctx, $T.class, ret)", erasureMethodType);
                 }
             } else {
-                registerMethodBuilder.addStatement("    ctx.next()");
+                registerMethodBuilder.addStatement("      ctx.next()");
             }
             //End the handler method
             registerMethodBuilder.addCode(
@@ -243,10 +244,12 @@ class RouteRegistrarCodeGenerator implements Generator {
 
         CookieValue cookieValue = param.getAnnotation(CookieValue.class);
         CookieObject cookieObject = param.getAnnotation(CookieObject.class);
+        SessionValue sessionValue = param.getAnnotation(SessionValue.class);
         PathParam pathParam = param.getAnnotation(PathParam.class);
         RequestHeader requestHeader = param.getAnnotation(RequestHeader.class);
         RequestParam requestParam = param.getAnnotation(RequestParam.class);
         RequestBody requestBody = param.getAnnotation(RequestBody.class);
+
 
         if (cookieValue != null) {
             String name = cookieValue.name() != null ? cookieValue.name() : cookieValue.value();
@@ -261,7 +264,15 @@ class RouteRegistrarCodeGenerator implements Generator {
                 name = param.getSimpleName().toString();
             }
             builder.addCode("ctx.getCookie($S)", name);
-        } else if (pathParam != null) {
+        } else if (sessionValue != null) {
+            String name = sessionValue.name() != null ? sessionValue.name() : sessionValue.value();
+            if (name.isEmpty()) {
+                name = param.getSimpleName().toString();
+            }
+            builder.addCode("helper.getSessionValue($T.class, ctx, $S, $L, $S)", paramType, name,
+                    sessionValue.required(), noneToNull(sessionValue.defaultValue()));
+        }
+        else if (pathParam != null) {
             String name = pathParam.value();
             if (name.isEmpty()) {
                 name = param.getSimpleName().toString();
