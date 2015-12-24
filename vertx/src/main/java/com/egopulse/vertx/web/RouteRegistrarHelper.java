@@ -108,7 +108,7 @@ public interface RouteRegistrarHelper {
             return (T) ctx.getBodyAsJson();
         }
         if (Buffer.class.equals(clazz)) {
-            return (T) ctx.getBodyAsJson();
+            return (T) ctx.getBody();
         }
         return stringToObject(clazz, ctx.getBodyAsString());
     }

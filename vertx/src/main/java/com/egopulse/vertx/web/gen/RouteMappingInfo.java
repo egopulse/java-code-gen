@@ -4,7 +4,6 @@ import com.egopulse.web.annotation.Blocking;
 import com.egopulse.web.annotation.CONNECT;
 import com.egopulse.web.annotation.Consume;
 import com.egopulse.web.annotation.ContentType;
-import com.egopulse.web.annotation.CookieValue;
 import com.egopulse.web.annotation.DELETE;
 import com.egopulse.web.annotation.GET;
 import com.egopulse.web.annotation.HEAD;
@@ -132,8 +131,10 @@ class RouteMappingInfo {
             }
 
             Collections.addAll(ret, produce.custom());
-            RouteMapping routeMapping = element.getAnnotation(RouteMapping.class);
-            for (ContentType type: routeMapping.produces()) {
+        }
+        RouteMapping routeMapping = element.getAnnotation(RouteMapping.class);
+        if (routeMapping != null) {
+            for (ContentType type : routeMapping.produces()) {
                 ret.add(type.toString());
             }
         }
@@ -155,7 +156,9 @@ class RouteMappingInfo {
                 ret.add(type.toString());
             }
             Collections.addAll(ret, consume.custom());
-            RouteMapping routeMapping = element.getAnnotation(RouteMapping.class);
+        }
+        RouteMapping routeMapping = element.getAnnotation(RouteMapping.class);
+        if (routeMapping != null) {
             for (ContentType type : routeMapping.consumes()) {
                 ret.add(type.toString());
             }
