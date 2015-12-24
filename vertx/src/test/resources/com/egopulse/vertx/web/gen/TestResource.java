@@ -1,7 +1,9 @@
 package com.egopulse.vertx.web.gen;
 
 import com.egopulse.web.annotation.Blocking;
+import com.egopulse.web.annotation.Consume;
 import com.egopulse.web.annotation.CookieValue;
+import com.egopulse.web.annotation.GET;
 import com.egopulse.web.annotation.HttpMethod;
 import com.egopulse.web.annotation.Method;
 import com.egopulse.web.annotation.Ordered;
@@ -32,7 +34,7 @@ public class TestResource {
         return new TestBean("aaa");
     }
 
-    @CookieValue.GET
+    @GET
     @Path("/test3")
     public String test3() {
         return "bbbb";

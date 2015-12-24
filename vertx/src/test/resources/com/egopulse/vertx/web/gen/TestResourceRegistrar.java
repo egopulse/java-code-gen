@@ -10,6 +10,7 @@ import io.vertx.ext.web.Session;
 import io.vertx.rxjava.ext.web.Route;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
+import java.lang.Class;
 import java.lang.String;
 
 public class TestResourceRegistrar implements RouteRegistrar<TestResource> {
@@ -20,7 +21,6 @@ public class TestResourceRegistrar implements RouteRegistrar<TestResource> {
             route.method(HttpMethod.POST);
             route.method(HttpMethod.GET);
             route.produces("application/json");
-            route.consumes("application/json");
             Handler<RoutingContext> handler = ctx -> {
                 try {
                     String ret = target.test(helper.getPathParam(String.class, ctx, "pathParam"), helper.getReqParam(int.class, ctx, "reqParam", true, null), helper.getCookieValue(boolean.class, ctx, "cookieValue", true, null));
@@ -36,7 +36,6 @@ public class TestResourceRegistrar implements RouteRegistrar<TestResource> {
             route.path("/api/test2");
             route.method(HttpMethod.POST);
             route.produces("application/json");
-            route.consumes("application/json");
             route.order(1000);
             Handler<RoutingContext> handler = ctx -> {
                 try {
@@ -53,7 +52,6 @@ public class TestResourceRegistrar implements RouteRegistrar<TestResource> {
             route.path("/api/test3");
             route.method(HttpMethod.GET);
             route.produces("application/json");
-            route.consumes("application/json");
             Handler<RoutingContext> handler = ctx -> {
                 try {
                     String ret = target.test3();
@@ -69,7 +67,6 @@ public class TestResourceRegistrar implements RouteRegistrar<TestResource> {
             route.path("/api/test3");
             route.method(HttpMethod.DELETE);
             route.produces("application/json");
-            route.consumes("application/json");
             Handler<RoutingContext> handler = ctx -> {
                 try {
                     String ret = target.test3Delete();
@@ -80,5 +77,9 @@ public class TestResourceRegistrar implements RouteRegistrar<TestResource> {
             };
             route.handler(handler);
         }
+    }
+
+    public Class<TestResource> getTargetType() {
+        return TestResource.class;
     }
 }

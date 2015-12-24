@@ -160,10 +160,6 @@ class RouteMappingInfo {
                 ret.add(type.toString());
             }
         }
-        Restful restful = element.getAnnotation(Restful.class);
-        if (restful != null) {
-            ret.add(ContentType.APP_JSON.toString());
-        }
         return ret;
     }
 

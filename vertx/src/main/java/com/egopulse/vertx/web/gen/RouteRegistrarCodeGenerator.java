@@ -85,6 +85,7 @@ class RouteRegistrarCodeGenerator implements Generator {
     private final TypeMirror reqType;
     private final TypeMirror respType;
     private final TypeMirror routeType;
+    private final TypeMirror routerType;
     private final TypeMirror sessionType;
 
     public RouteRegistrarCodeGenerator(Models models) {
@@ -94,6 +95,7 @@ class RouteRegistrarCodeGenerator implements Generator {
         reqType = elementsUtil.getTypeElement(HttpServerRequest.class.getCanonicalName()).asType();
         respType = elementsUtil.getTypeElement(HttpServerResponse.class.getCanonicalName()).asType();
         routeType = elementsUtil.getTypeElement(Route.class.getCanonicalName()).asType();
+        routerType = elementsUtil.getTypeElement(Router.class.getCanonicalName()).asType();
         sessionType = elementsUtil.getTypeElement(Session.class.getCanonicalName()).asType();
     }
 
@@ -119,11 +121,12 @@ class RouteRegistrarCodeGenerator implements Generator {
         RouteMappingInfo defaultInfo = new RouteMappingInfo(typeElem);
 
         for (ExecutableElement method : models.getPublicNonStaticMethods(typeElem)) {
-            if (!Models.isAnnotatedWithOneOf(typeElem, ALL_MAPPING_TYPES)) {
+            if (!Models.isAnnotatedWithOneOf(method, ALL_MAPPING_TYPES)) {
                 continue;
             }
 
             TypeMirror methodType = method.getReturnType();
+            TypeMirror erasureMethodType = models.getTypeUtils().erasure(methodType);
             TypeName methodTypeName = TypeName.get(methodType);
             RouteMappingInfo methodRouteMappingInfo =  new RouteMappingInfo(method);
 
@@ -159,9 +162,9 @@ class RouteRegistrarCodeGenerator implements Generator {
             if (methodType.getKind() != TypeKind.VOID) {
                 boolean responseBody = defaultInfo.isResponseBody() || methodRouteMappingInfo.isResponseBody();
                 if (responseBody) {
-                    registerMethodBuilder.addStatement("    helper.handleResponseBody(ctx, $T.class, ret)", methodType);
+                    registerMethodBuilder.addStatement("    helper.handleResponseBody(ctx, $T.class, ret)", erasureMethodType);
                 } else {
-                    registerMethodBuilder.addStatement("    helper.handleResponse(ctx, $T.class, ret)", methodType);
+                    registerMethodBuilder.addStatement("    helper.handleResponse(ctx, $T.class, ret)", erasureMethodType);
                 }
             } else {
                 registerMethodBuilder.addStatement("    ctx.next()");
@@ -185,6 +188,14 @@ class RouteRegistrarCodeGenerator implements Generator {
         }
 
         registrarClassBuilder.addMethod(registerMethodBuilder.build());
+
+
+        registrarClassBuilder.addMethod(MethodSpec.methodBuilder("getTargetType")
+                .addModifiers(Modifier.PUBLIC)
+                .returns(ParameterizedTypeName.get(ClassName.get(Class.class), targetTypeName))
+                .addStatement("return $T.class", typeElem.asType())
+                .build());
+
         PackageElement packageElem = Models.getPackage(typeElem);
         String packageName = packageElem.getQualifiedName().toString();
         JavaFile.builder(packageName, registrarClassBuilder.build()).build().writeTo(filer);
@@ -274,6 +285,8 @@ class RouteRegistrarCodeGenerator implements Generator {
             builder.addCode("helper.getReqBody($T.class, ctx)", paramType);
         } else if (typesUtil.isSameType(routeType, paramType)) {
             builder.addCode("ctx.currentRoute()");
+        } else if (typesUtil.isSameType(routerType, paramType)) {
+            builder.addCode("router");
         } else if (typesUtil.isSameType(routingCtxType, paramType)) {
             builder.addCode("ctx");
         } else if (typesUtil.isSameType(reqType, paramType)) {
@@ -283,7 +296,7 @@ class RouteRegistrarCodeGenerator implements Generator {
         } else if (typesUtil.isSameType(sessionType, paramType)) {
             builder.addCode("ctx.session()");
         } else {
-            builder.addCode("helper.getParam($T.class, ctx)", paramType);
+            builder.addCode("helper.getParam($T.class, ctx)", typesUtil.erasure(paramType));
         }
     }
 

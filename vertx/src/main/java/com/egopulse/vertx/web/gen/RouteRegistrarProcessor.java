@@ -7,7 +7,7 @@ import com.egopulse.web.annotation.Restful;
 import com.egopulse.web.annotation.RouteHandlers;
 
 public class RouteRegistrarProcessor extends TypeModelAnnotationProcessor {
-    protected RouteRegistrarProcessor() {
+    public RouteRegistrarProcessor() {
         super(RouteHandlers.class, Restful.class);
     }
 

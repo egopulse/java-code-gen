@@ -4,8 +4,10 @@ package com.egopulse.web.annotation;
  * All known content types
  */
 public enum ContentType {
+    ANY("*/*"),
     APP_JSON("application/json"),
     APP_XML("application/xml"),
+    APP_ALL("application/*"),
     APP_FORM_URLENCODED("application/x-www-form-urlencoded"),
     APP_JAVASCRIPT("application/javascript"),
     MULTIPART_FORM_DATA("multipart/form-data"),

@@ -9,7 +9,7 @@ import io.vertx.rxjava.core.http.HttpServerResponse;
 import io.vertx.rxjava.ext.web.RoutingContext;
 import io.vertx.rxjava.ext.web.sstore.SessionStore;
 import rx.Observable;
-import rx.Subscriber;
+import rx.Single;
 
 public interface RouteRegistrarHelper {
     default <T> String objectToString(T val) {
@@ -104,25 +104,16 @@ public interface RouteRegistrarHelper {
     @SuppressWarnings("unchecked")
     default <R> void handleResponse(RoutingContext ctx, Class<R> retType, R ret) {
         if (ret != null) {
+            Single single = null;
             if (ret instanceof Observable) {
-                ((Observable) ret).subscribe(new Subscriber() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        handleError(ctx, e);
-                    }
-
-                    @Override
-                    public void onNext(Object o) {
-                        if (o != null) {
-                            handleSingleResponse(ctx, (Class) o.getClass(), o);
-                        }
-                    }
-                });
+                single = ((Observable) ret).toSingle();
+            } else if (ret instanceof Single) {
+                single = (Single) ret;
+            }
+            if (single != null) {
+                single.subscribe(
+                        r -> handleSingleResponse(ctx, (Class) r.getClass(), r),
+                        e -> handleError(ctx, (Throwable) e));
             } else {
                 handleSingleResponse(ctx, retType, ret);
             }
@@ -139,46 +130,36 @@ public interface RouteRegistrarHelper {
         HttpServerResponse resp = ctx.response();
         if (ret != null) {
             if (ret instanceof String) {
-                resp.write((String) ret);
+                resp.end((String) ret);
             } else if (ret instanceof Buffer) {
-                resp.write((Buffer) ret);
+                resp.end((Buffer) ret);
             } else if (ret instanceof JsonObject) {
-                resp.write(((JsonObject) ret).encode());
+                resp.end(((JsonObject) ret).encode());
             } else if (ret instanceof JsonArray) {
-                resp.write(((JsonArray) ret).encode());
+                resp.end(((JsonArray) ret).encode());
             } else {
-                resp.write(objectToString(ret));
+                resp.end(objectToString(ret));
             }
         }
     }
 
     @SuppressWarnings("unchecked")
-    default <R> void handleResponseBody(RoutingContext ctx, Class<R> clazz, R ret) {
+    default <R> void handleResponseBody(RoutingContext ctx, Class<R> retType, R ret) {
         HttpServerResponse resp = ctx.response();
         if (ret != null) {
             resp.putHeader("content-type", ctx.getAcceptableContentType());
+            Single single = null;
             if (ret instanceof Observable) {
-                ((Observable) ret).subscribe(new Subscriber() {
-                    @Override
-                    public void onCompleted() {
-                        resp.end();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        handleError(ctx, e);
-                    }
-
-                    @Override
-                    public void onNext(Object o) {
-                        if (o != null) {
-                            handleSingleResponseBody(ctx, (Class) o.getClass(), o);
-                        }
-                    }
-                });
+                single = ((Observable) ret).toSingle();
+            } else if (ret instanceof Single) {
+                single = (Single) ret;
+            }
+            if (single != null) {
+                single.subscribe(
+                        r -> handleSingleResponseBody(ctx, (Class) r.getClass(), r),
+                        e -> handleError(ctx, (Throwable) e));
             } else {
-                handleSingleResponseBody(ctx, clazz, ret);
-                resp.end();
+                handleSingleResponseBody(ctx, retType, ret);
             }
         } else {
             resp.end();
