@@ -4,19 +4,26 @@ import com.egopulse.bson.gen.Generator;
 import com.egopulse.bson.gen.Models;
 import com.egopulse.vertx.web.RouteRegistrarHelper;
 import com.egopulse.vertx.web.RouteRegistrar;
-import com.egopulse.web.annotation.Blocking;
-import com.egopulse.web.annotation.ContentType;
+import com.egopulse.web.annotation.CONNECT;
+import com.egopulse.web.annotation.Consume;
 import com.egopulse.web.annotation.CookieObject;
 import com.egopulse.web.annotation.CookieValue;
+import com.egopulse.web.annotation.DELETE;
+import com.egopulse.web.annotation.GET;
+import com.egopulse.web.annotation.HEAD;
 import com.egopulse.web.annotation.HttpMethod;
-import com.egopulse.web.annotation.Ordered;
+import com.egopulse.web.annotation.Method;
+import com.egopulse.web.annotation.PATCH;
+import com.egopulse.web.annotation.POST;
+import com.egopulse.web.annotation.PUT;
+import com.egopulse.web.annotation.Path;
 import com.egopulse.web.annotation.PathParam;
+import com.egopulse.web.annotation.Produce;
 import com.egopulse.web.annotation.RequestBody;
 import com.egopulse.web.annotation.RequestHeader;
 import com.egopulse.web.annotation.RequestParam;
-import com.egopulse.web.annotation.ResponseBody;
-import com.egopulse.web.annotation.Restful;
 import com.egopulse.web.annotation.RouteMapping;
+import com.egopulse.web.annotation.TRACE;
 import com.egopulse.web.annotation.ValueConstants;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
@@ -44,11 +51,34 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
-public class RouteRegistrarCodeGenerator implements Generator {
+class RouteRegistrarCodeGenerator implements Generator {
+    private static final List<Class<? extends Annotation>> ALL_MAPPING_TYPES;
+
+    static  {
+        ALL_MAPPING_TYPES = new ArrayList<>();
+        ALL_MAPPING_TYPES.add(RouteMapping.class);
+        ALL_MAPPING_TYPES.add(Path.class);
+        ALL_MAPPING_TYPES.add(Consume.class);
+        ALL_MAPPING_TYPES.add(Produce.class);
+        ALL_MAPPING_TYPES.add(Method.class);
+        ALL_MAPPING_TYPES.add(CONNECT.class);
+        ALL_MAPPING_TYPES.add(DELETE.class);
+        ALL_MAPPING_TYPES.add(GET.class);
+        ALL_MAPPING_TYPES.add(HEAD.class);
+        ALL_MAPPING_TYPES.add(PATCH.class);
+        ALL_MAPPING_TYPES.add(POST.class);
+        ALL_MAPPING_TYPES.add(PUT.class);
+        ALL_MAPPING_TYPES.add(TRACE.class);
+    }
+
+
     private final List<String> generatedClassNames = new ArrayList<>();
+
 
     private final Models models;
     private final TypeMirror routingCtxType;
@@ -86,27 +116,22 @@ public class RouteRegistrarCodeGenerator implements Generator {
                 .addParameter(RouteRegistrarHelper.class, "helper", Modifier.FINAL)
                 .addParameter(targetTypeName, "target", Modifier.FINAL);
 
-        Restful restful = typeElem.getAnnotation(Restful.class);
-        RouteMapping classMapping = typeElem.getAnnotation(RouteMapping.class);
-        Blocking defaultBlocking = typeElem.getAnnotation(Blocking.class);
+        RouteMappingInfo defaultInfo = new RouteMappingInfo(typeElem);
 
-        List<ExecutableElement> methods = models.getPublicNonStaticAnnotatedMethod(typeElem, RouteMapping.class);
-        for (ExecutableElement method : methods) {
+        for (ExecutableElement method : models.getPublicNonStaticMethods(typeElem)) {
+            if (!Models.isAnnotatedWithOneOf(typeElem, ALL_MAPPING_TYPES)) {
+                continue;
+            }
+
             TypeMirror methodType = method.getReturnType();
             TypeName methodTypeName = TypeName.get(methodType);
-            RouteMapping mapping = method.getAnnotation(RouteMapping.class);
+            RouteMappingInfo methodRouteMappingInfo =  new RouteMappingInfo(method);
 
             // New scope to avoid local variable names clashing
             registerMethodBuilder.addCode("{\n");
 
             registerMethodBuilder.addStatement("  $T route = router.route()", Route.class);
-            configMapping(registerMethodBuilder, classMapping, mapping, restful != null);
-            Ordered ordered = method.getAnnotation(Ordered.class);
-            if (ordered != null) {
-                if (ordered.value() != 0) {
-                    registerMethodBuilder.addStatement("  route.order($L)", ordered.value());
-                }
-            }
+            configMapping(registerMethodBuilder, defaultInfo, methodRouteMappingInfo);
 
             // Handler method
             registerMethodBuilder.addCode("  $T handler = ctx -> {\n", ParameterizedTypeName.get(Handler.class, RoutingContext.class));
@@ -132,8 +157,8 @@ public class RouteRegistrarCodeGenerator implements Generator {
 
             // Process response
             if (methodType.getKind() != TypeKind.VOID) {
-                ResponseBody responseBody = method.getAnnotation(ResponseBody.class);
-                if (responseBody != null || restful != null) {
+                boolean responseBody = defaultInfo.isResponseBody() || methodRouteMappingInfo.isResponseBody();
+                if (responseBody) {
                     registerMethodBuilder.addStatement("    helper.handleResponseBody(ctx, $T.class, ret)", methodType);
                 } else {
                     registerMethodBuilder.addStatement("    helper.handleResponse(ctx, $T.class, ret)", methodType);
@@ -148,9 +173,8 @@ public class RouteRegistrarCodeGenerator implements Generator {
                     "    };\n" +
                     "  };\n");
 
-
-            Blocking blocking = method.getAnnotation(Blocking.class);
-            if (defaultBlocking != null || blocking != null) {
+            boolean blocking = defaultInfo.isBlocking() || methodRouteMappingInfo.isBlocking();
+            if (blocking) {
                 registerMethodBuilder.addStatement("  route.blockingHandler(handler)");
             } else {
                 registerMethodBuilder.addStatement("  route.handler(handler)");
@@ -172,34 +196,33 @@ public class RouteRegistrarCodeGenerator implements Generator {
         writeServiceNames(RouteRegistrar.class, filer, generatedClassNames);
     }
 
-    private static void configMapping(MethodSpec.Builder builder, RouteMapping defaultMapping, RouteMapping mapping, boolean restful) {
-        String path = defaultMapping != null && !defaultMapping.path().isEmpty() ? defaultMapping.path() + mapping.path() : mapping.path();
-        String pathRegEx = defaultMapping != null && !defaultMapping.pathRegEx().isEmpty() ? defaultMapping.pathRegEx() + mapping.pathRegEx() : mapping.pathRegEx();
+    private static void configMapping(MethodSpec.Builder builder, RouteMappingInfo defaultInfo, RouteMappingInfo methodInfo) {
+        String path = defaultInfo.getPath().isEmpty() ? methodInfo.getPath() : defaultInfo.getPath() + methodInfo.getPath();
+        String pathRegEx = defaultInfo.getPathRegex().isEmpty() ? methodInfo.getPathRegex() : defaultInfo.getPathRegex() + methodInfo.getPathRegex();
         if (!path.isEmpty()) {
             builder.addStatement("  route.path($S)", path);
         } else if (!pathRegEx.isEmpty()) {
             builder.addStatement("  route.pathRegex($S)", pathRegEx);
         }
 
-        HttpMethod[] methods = mapping.method().length > 0 ? mapping.method() : defaultMapping != null ? defaultMapping.method() : new HttpMethod[0];
+        Set<HttpMethod> methods = methodInfo.getMethods().size() > 0 ? methodInfo.getMethods() : defaultInfo.getMethods();
         for (HttpMethod httpMethod : methods) {
             builder.addStatement("  route.method($T.$L)", io.vertx.core.http.HttpMethod.class, httpMethod);
         }
 
-        ContentType[] produces = mapping.produces().length > 0 ? mapping.produces() : defaultMapping != null ? defaultMapping.produces() : new ContentType[0];
-        if (produces.length == 0 && restful) {
-            produces = new ContentType[]{ContentType.APP_JSON};
-        }
-        for (ContentType contentType : produces) {
-            builder.addStatement("  route.produces($S)", contentType.toString());
+        Set<String> produces = methodInfo.getProduces().size() > 0 ? methodInfo.getProduces() : defaultInfo.getProduces();
+        for (String produce : produces) {
+            builder.addStatement("  route.produces($S)", produce);
         }
 
-        ContentType[] consumes = mapping.consumes().length > 0 ? mapping.consumes() : defaultMapping != null ? defaultMapping.consumes() : new ContentType[0];
-        if (consumes.length == 0 && restful) {
-            consumes = new ContentType[]{ContentType.APP_JSON};
+        Set<String> consumes = methodInfo.getConsumes().size() > 0 ? methodInfo.getConsumes() : defaultInfo.getConsumes();
+        for (String consume : consumes) {
+            builder.addStatement("  route.consumes($S)", consume);
         }
-        for (ContentType contentType : consumes) {
-            builder.addStatement("  route.consumes($S)", contentType.toString());
+
+        int order = methodInfo.getOrder();
+        if (order != 0) {
+            builder.addStatement("  route.order($L)", order);
         }
     }
 
@@ -270,4 +293,5 @@ public class RouteRegistrarCodeGenerator implements Generator {
         }
         return defaultValue;
     }
+
 }

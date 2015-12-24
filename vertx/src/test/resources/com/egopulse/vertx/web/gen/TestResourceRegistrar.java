@@ -17,8 +17,8 @@ public class TestResourceRegistrar implements RouteRegistrar<TestResource> {
         {
             Route route = router.route();
             route.path("/api/test/:pathParam");
-            route.method(HttpMethod.GET);
             route.method(HttpMethod.POST);
+            route.method(HttpMethod.GET);
             route.produces("application/json");
             route.consumes("application/json");
             Handler<RoutingContext> handler = ctx -> {
@@ -26,7 +26,7 @@ public class TestResourceRegistrar implements RouteRegistrar<TestResource> {
                     String ret = target.test(helper.getPathParam(String.class, ctx, "pathParam"), helper.getReqParam(int.class, ctx, "reqParam", true, null), helper.getCookieValue(boolean.class, ctx, "cookieValue", true, null));
                     helper.handleResponseBody(ctx, String.class, ret);
                 } catch (Throwable t) {;
-                    helper.handleError(t);
+                    helper.handleError(ctx, t);
                 };
             };
             route.handler(handler);
@@ -47,6 +47,38 @@ public class TestResourceRegistrar implements RouteRegistrar<TestResource> {
                 };
             };
             route.blockingHandler(handler);
+        }
+        {
+            Route route = router.route();
+            route.path("/api/test3");
+            route.method(HttpMethod.GET);
+            route.produces("application/json");
+            route.consumes("application/json");
+            Handler<RoutingContext> handler = ctx -> {
+                try {
+                    String ret = target.test3();
+                    helper.handleResponseBody(ctx, String.class, ret);
+                } catch (Throwable t) {;
+                    helper.handleError(ctx, t);
+                };
+            };
+            route.handler(handler);
+        }
+        {
+            Route route = router.route();
+            route.path("/api/test3");
+            route.method(HttpMethod.DELETE);
+            route.produces("application/json");
+            route.consumes("application/json");
+            Handler<RoutingContext> handler = ctx -> {
+                try {
+                    String ret = target.test3Delete();
+                    helper.handleResponseBody(ctx, String.class, ret);
+                } catch (Throwable t) {;
+                    helper.handleError(ctx, t);
+                };
+            };
+            route.handler(handler);
         }
     }
 }

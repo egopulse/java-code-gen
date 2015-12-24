@@ -1,23 +1,20 @@
 package com.egopulse.vertx.web.gen;
 
 import com.egopulse.web.annotation.Blocking;
-import com.egopulse.web.annotation.ContentType;
 import com.egopulse.web.annotation.CookieValue;
 import com.egopulse.web.annotation.HttpMethod;
+import com.egopulse.web.annotation.Method;
 import com.egopulse.web.annotation.Ordered;
+import com.egopulse.web.annotation.Path;
 import com.egopulse.web.annotation.PathParam;
 import com.egopulse.web.annotation.RequestParam;
-import com.egopulse.web.annotation.ResponseBody;
 import com.egopulse.web.annotation.Restful;
-import com.egopulse.web.annotation.RouteHandlers;
 import com.egopulse.web.annotation.RouteMapping;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
-import io.vertx.ext.web.Cookie;
 import io.vertx.ext.web.Route;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.Session;
-import junit.framework.Test;
 
 @Restful
 @RouteMapping(path = "/api")
@@ -33,6 +30,18 @@ public class TestResource {
     @RouteMapping(path = "/test2", method = HttpMethod.POST)
     public TestBean test2(Session session, Route route, RoutingContext ctx, HttpServerRequest req, HttpServerResponse resp) {
         return new TestBean("aaa");
+    }
+
+    @CookieValue.GET
+    @Path("/test3")
+    public String test3() {
+        return "bbbb";
+    }
+
+    @Method(HttpMethod.DELETE)
+    @Path("/test3")
+    public String test3Delete() {
+        return "bbbb";
     }
 
     public static class TestBean {

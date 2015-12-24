@@ -58,6 +58,7 @@ public final class TestPojoPropNameExtractor implements TestPojo, Supplier<Strin
         this.lastName="boolean";
         return false;
     }
+}
 ```
 
 The property name extractor is useful when you want to build kind of strong-typed class mapping, by default it 

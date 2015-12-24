@@ -1,5 +1,8 @@
 package com.egopulse.web.annotation;
 
+/**
+ * All known content types
+ */
 public enum ContentType {
     APP_JSON("application/json"),
     APP_XML("application/xml"),

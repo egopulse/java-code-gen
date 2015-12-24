@@ -61,8 +61,13 @@ public class Models {
         return modifiers.contains(Modifier.PUBLIC) && !modifiers.contains(Modifier.STATIC);
     }
 
-    public static <T extends Annotation> boolean isAnnotatedWith(Element element, Class<T> annotationClass) {
-        return element.getAnnotation(annotationClass) != null;
+    public static boolean isAnnotatedWithOneOf(Element element, Iterable<Class<? extends Annotation>> annotationClasses) {
+        for (Class<? extends Annotation> clazz : annotationClasses) {
+            if (element.getAnnotation(clazz) != null) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static boolean isField(Element element) {
@@ -213,9 +218,9 @@ public class Models {
                 .collect(Collectors.toList());
     }
 
-    public <T extends Annotation> List<ExecutableElement> getPublicNonStaticAnnotatedMethod(TypeElement typeElement, Class<T> annotationClass) {
+    public <T extends Annotation> List<ExecutableElement> getPublicNonStaticMethods(TypeElement typeElement) {
         return elemsUtil.getAllMembers(typeElement).stream()
-                .filter(Models::isMethod).filter(m -> isNotBelongToObject(m) && isPublicNonStatic(m) && isAnnotatedWith(m, annotationClass))
+                .filter(Models::isMethod).filter(m -> isNotBelongToObject(m) && isPublicNonStatic(m))
                 .map(elem -> (ExecutableElement) elem)
                 .collect(Collectors.toList());
     }
