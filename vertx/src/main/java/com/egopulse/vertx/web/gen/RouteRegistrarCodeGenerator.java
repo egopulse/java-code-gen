@@ -82,22 +82,36 @@ class RouteRegistrarCodeGenerator implements Generator {
 
 
     private final Models models;
+    private final TypeMirror stringType;
     private final TypeMirror routingCtxType;
+    private final TypeMirror routingCtxTypeCore;
     private final TypeMirror reqType;
+    private final TypeMirror reqTypeCore;
     private final TypeMirror respType;
+    private final TypeMirror respTypeCore;
     private final TypeMirror routeType;
+    private final TypeMirror routeTypeCore;
     private final TypeMirror routerType;
+    private final TypeMirror routerTypeCore;
     private final TypeMirror sessionType;
+    private final TypeMirror sessionTypeCore;
 
     public RouteRegistrarCodeGenerator(Models models) {
         this.models = models;
         Elements elementsUtil = models.getElemsUtil();
+        stringType = elementsUtil.getTypeElement(String.class.getCanonicalName()).asType();
         routingCtxType = elementsUtil.getTypeElement(RoutingContext.class.getCanonicalName()).asType();
+        routingCtxTypeCore = elementsUtil.getTypeElement(io.vertx.ext.web.RoutingContext.class.getCanonicalName()).asType();
         reqType = elementsUtil.getTypeElement(HttpServerRequest.class.getCanonicalName()).asType();
+        reqTypeCore = elementsUtil.getTypeElement(io.vertx.core.http.HttpServerRequest.class.getCanonicalName()).asType();
         respType = elementsUtil.getTypeElement(HttpServerResponse.class.getCanonicalName()).asType();
+        respTypeCore = elementsUtil.getTypeElement(io.vertx.core.http.HttpServerResponse.class.getCanonicalName()).asType();
         routeType = elementsUtil.getTypeElement(Route.class.getCanonicalName()).asType();
+        routeTypeCore = elementsUtil.getTypeElement(io.vertx.ext.web.Route.class.getCanonicalName()).asType();
         routerType = elementsUtil.getTypeElement(Router.class.getCanonicalName()).asType();
+        routerTypeCore = elementsUtil.getTypeElement(io.vertx.ext.web.Router.class.getCanonicalName()).asType();
         sessionType = elementsUtil.getTypeElement(Session.class.getCanonicalName()).asType();
+        sessionTypeCore = elementsUtil.getTypeElement(io.vertx.ext.web.Session.class.getCanonicalName()).asType();
     }
 
     @Override
@@ -241,6 +255,7 @@ class RouteRegistrarCodeGenerator implements Generator {
     private void addParamValue(MethodSpec.Builder builder, VariableElement param) {
         TypeMirror paramType = param.asType();
         Types typesUtil = models.getTypeUtils();
+        String paramName = param.getSimpleName().toString();
 
         CookieValue cookieValue = param.getAnnotation(CookieValue.class);
         CookieObject cookieObject = param.getAnnotation(CookieObject.class);
@@ -254,20 +269,20 @@ class RouteRegistrarCodeGenerator implements Generator {
         if (cookieValue != null) {
             String name = cookieValue.name() != null ? cookieValue.name() : cookieValue.value();
             if (name.isEmpty()) {
-                name = param.getSimpleName().toString();
+                name = paramName;
             }
             builder.addCode("helper.getCookieValue($T.class, ctx, $S, $L, $S)", paramType, name,
                     cookieValue.required(), noneToNull(cookieValue.defaultValue()));
         } else if (cookieObject != null) {
             String name = cookieObject.name() != null ? cookieObject.name() : cookieObject.value();
             if (name.isEmpty()) {
-                name = param.getSimpleName().toString();
+                name = paramName;
             }
             builder.addCode("ctx.getCookie($S)", name);
         } else if (sessionValue != null) {
             String name = sessionValue.name() != null ? sessionValue.name() : sessionValue.value();
             if (name.isEmpty()) {
-                name = param.getSimpleName().toString();
+                name = paramName;
             }
             builder.addCode("helper.getSessionValue($T.class, ctx, $S, $L, $S)", paramType, name,
                     sessionValue.required(), noneToNull(sessionValue.defaultValue()));
@@ -275,20 +290,20 @@ class RouteRegistrarCodeGenerator implements Generator {
         else if (pathParam != null) {
             String name = pathParam.value();
             if (name.isEmpty()) {
-                name = param.getSimpleName().toString();
+                name = paramName;
             }
             builder.addCode("helper.getPathParam($T.class, ctx, $S)", paramType, name);
         } else if (requestHeader != null) {
             String name = requestHeader.name() != null ? requestHeader.name() : requestHeader.value();
             if (name.isEmpty()) {
-                name = param.getSimpleName().toString();
+                name = paramName;
             }
             builder.addCode("helper.getReqHeader($T.class, ctx, $S, $L, $S)", paramType, name,
                     requestHeader.required(), noneToNull(requestHeader.defaultValue()));
         } else if (requestParam != null) {
             String name = requestParam.name() != null ? requestParam.name() : requestParam.value();
             if (name.isEmpty()) {
-                name = param.getSimpleName().toString();
+                name = paramName;
             }
             builder.addCode("helper.getReqParam($T.class, ctx, $S, $L, $S)", paramType, name,
                     requestParam.required(), noneToNull(requestParam.defaultValue()));
@@ -296,18 +311,32 @@ class RouteRegistrarCodeGenerator implements Generator {
             builder.addCode("helper.getReqBody($T.class, ctx)", paramType);
         } else if (typesUtil.isSameType(routeType, paramType)) {
             builder.addCode("ctx.currentRoute()");
+        } else if (typesUtil.isSameType(routeTypeCore, paramType)) {
+            builder.addCode("($T) ctx.currentRoute().getDelegate()", TypeName.get(io.vertx.ext.web.Route.class));
         } else if (typesUtil.isSameType(routerType, paramType)) {
             builder.addCode("router");
+        } else if (typesUtil.isSameType(routerTypeCore, paramType)) {
+            builder.addCode("($T) router.getDelegate()", TypeName.get(io.vertx.ext.web.Router.class));
         } else if (typesUtil.isSameType(routingCtxType, paramType)) {
             builder.addCode("ctx");
+        } else if (typesUtil.isSameType(routingCtxTypeCore, paramType)) {
+            builder.addCode("($T) ctx", TypeName.get(io.vertx.ext.web.RoutingContext.class));
         } else if (typesUtil.isSameType(reqType, paramType)) {
             builder.addCode("ctx.request()");
+        } else if (typesUtil.isSameType(reqTypeCore, paramType)) {
+            builder.addCode("($T) ctx.request().getDelegate()", TypeName.get(io.vertx.core.http.HttpServerRequest.class));
         } else if (typesUtil.isSameType(respType, paramType)) {
             builder.addCode("ctx.response()");
+        } else if (typesUtil.isSameType(respTypeCore, paramType)) {
+            builder.addCode("($T) ctx.response().getDelegate()", TypeName.get(io.vertx.core.http.HttpServerResponse.class));
         } else if (typesUtil.isSameType(sessionType, paramType)) {
             builder.addCode("ctx.session()");
+        } else if (typesUtil.isSameType(sessionTypeCore, paramType)) {
+            builder.addCode("($T) ctx.session().getDelegate()", TypeName.get(io.vertx.ext.web.Session.class));
+        } else if (paramType.getKind().isPrimitive() || typesUtil.isSameType(stringType, paramType)) {
+            builder.addCode("helper.getReqParam($T.class, ctx, $S, true, null)", paramType, paramName);
         } else {
-            builder.addCode("helper.getParam($T.class, ctx)", typesUtil.erasure(paramType));
+            builder.addCode("helper.getParam($T.class, ctx, $S)", typesUtil.erasure(paramType), paramName);
         }
     }
 

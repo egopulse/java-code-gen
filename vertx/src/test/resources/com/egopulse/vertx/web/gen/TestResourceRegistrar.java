@@ -39,7 +39,7 @@ public class TestResourceRegistrar implements RouteRegistrar<TestResource> {
             route.order(1000);
             Handler<RoutingContext> handler = ctx -> {
                 try {
-                    TestResource.TestBean ret = target.test2(helper.getParam(Session.class, ctx), helper.getParam(io.vertx.ext.web.Route.class, ctx), helper.getParam(io.vertx.ext.web.RoutingContext.class, ctx), helper.getParam(HttpServerRequest.class, ctx), helper.getParam(HttpServerResponse.class, ctx));
+                    TestResource.TestBean ret = target.test2((Session) ctx.session().getDelegate(), (io.vertx.ext.web.Route) ctx.currentRoute().getDelegate(), (io.vertx.ext.web.RoutingContext) ctx, (HttpServerRequest) ctx.request().getDelegate(), (HttpServerResponse) ctx.response().getDelegate());
                     helper.handleResponseBody(ctx, TestResource.TestBean.class, ret);
                 } catch (Throwable t) {;
                     helper.handleError(ctx, t);
@@ -69,7 +69,7 @@ public class TestResourceRegistrar implements RouteRegistrar<TestResource> {
             route.produces("application/json");
             Handler<RoutingContext> handler = ctx -> {
                 try {
-                    String ret = target.test3Delete(helper.getSessionValue(String.class, ctx, "sessionValue", true, null));
+                    String ret = target.test3Delete(helper.getSessionValue(String.class, ctx, "sessionValue", true, null), helper.getReqParam(String.class, ctx, "name", true, null), helper.getParam(TestResource.TestBean.class, ctx, "bean"));
                     helper.handleResponseBody(ctx, String.class, ret);
                 } catch (Throwable t) {;
                     helper.handleError(ctx, t);

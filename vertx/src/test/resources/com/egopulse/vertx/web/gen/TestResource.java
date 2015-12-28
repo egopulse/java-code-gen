@@ -43,7 +43,7 @@ public class TestResource {
 
     @Method(HttpMethod.DELETE)
     @Path("/test3")
-    public String test3Delete(@SessionValue String sessionValue) {
+    public String test3Delete(@SessionValue String sessionValue, String name, TestBean bean) {
         return "bbbb";
     }
 

@@ -26,7 +26,7 @@ public interface RouteRegistrarHelper {
 
     SessionStore getSessionStore();
 
-    default <T> T getParam(Class<T> clazz, RoutingContext ctx) {
+    default <T> T getParam(Class<T> clazz, RoutingContext ctx, String name) {
         return null;
     }
 
