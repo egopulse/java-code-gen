@@ -8,6 +8,7 @@ import io.vertx.codegen.Case;
 import io.vertx.codegen.CodeGen;
 import io.vertx.codegen.CodeGenProcessor;
 import io.vertx.codegen.GenException;
+import io.vertx.codegen.GenExceptionReporter;
 import io.vertx.codegen.Helper;
 import io.vertx.codegen.MethodKind;
 import io.vertx.codegen.Model;
@@ -179,19 +180,20 @@ public class DataObjectProcessor extends AbstractProcessor {
                                             writer.append(output);
                                         }
                                     }
-                                    log.info("Generated model " + model.getFqn() + ": " + relativeName);
+                                    String logStr = "Generated model " + model.getFqn() + ": " + relativeName;
+                                    log.info(logStr);
+                                    processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, logStr, entry.getKey());
                                 }
                             }
                         }
                     } catch (GenException e) {
-                        reportGenException(e);
+                        reportGenException(e, entry.getKey());
                     } catch (Exception e) {
                         reportException(e, entry.getKey());
                     }
                 });
             }
         } else {
-
             // Incremental post processing
             generatedFiles.values().forEach(generated -> {
                 File file = generated.file;
@@ -207,7 +209,7 @@ public class DataObjectProcessor extends AbstractProcessor {
                             String part = processing.generator.transformTemplate.render(processing.model, vars);
                             fileWriter.append(part);
                         } catch (GenException e) {
-                            reportGenException(e);
+                            reportGenException(e, processing.model.getElement());
                         } catch (Exception e) {
                             reportException(e, processing.model.getElement());
                         }
@@ -220,10 +222,10 @@ public class DataObjectProcessor extends AbstractProcessor {
         return true;
     }
 
-    private void reportGenException(GenException e) {
-        String msg = "Could not generate model";
+    private void reportGenException(GenException e, Element elt) {
+        String msg = "Could not generate element for " + elt + ": " + e.getMessage();
         log.log(Level.SEVERE, msg, e);
-        processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, msg);
+        GenExceptionReporter.report(e, processingEnv.getMessager());
     }
 
     private void reportException(Exception e, Element elt) {
