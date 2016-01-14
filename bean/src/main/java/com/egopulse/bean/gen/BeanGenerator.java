@@ -1,8 +1,8 @@
 package com.egopulse.bean.gen;
 
-import com.egopulse.bson.gen.Generator;
-import com.egopulse.bson.gen.GeneratorException;
-import com.egopulse.bson.gen.Models;
+import com.egopulse.gen.Generator;
+import com.egopulse.gen.GeneratorException;
+import com.egopulse.gen.Models;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;

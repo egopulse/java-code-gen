@@ -1,4 +1,4 @@
-package com.egopulse.bson.gen;
+package com.egopulse.gen;
 
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.Processor;

@@ -1,4 +1,4 @@
-package com.egopulse.bson.gen;
+package com.egopulse.gen;
 
 import javax.lang.model.element.Element;
 import java.io.PrintWriter;

@@ -1,8 +1,8 @@
 package com.egopulse.bean.gen;
 
-import com.egopulse.bson.gen.Generator;
-import com.egopulse.bson.gen.Models;
-import com.egopulse.bson.gen.TypeModelAnnotationProcessor;
+import com.egopulse.gen.Generator;
+import com.egopulse.gen.Models;
+import com.egopulse.gen.TypeModelAnnotationProcessor;
 
 public class BeanProcessor extends TypeModelAnnotationProcessor {
     public BeanProcessor() {

@@ -1,5 +1,6 @@
 package com.egopulse.bson.gen;
 
+import com.egopulse.gen.Models;
 import com.google.testing.compile.JavaFileObjects;
 import org.junit.Assert;
 import org.junit.Test;

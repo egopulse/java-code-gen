@@ -1,7 +1,7 @@
 package com.egopulse.vertx.web.gen;
 
-import com.egopulse.bson.gen.Generator;
-import com.egopulse.bson.gen.Models;
+import com.egopulse.gen.Generator;
+import com.egopulse.gen.Models;
 import com.egopulse.vertx.web.RouteRegistrarHelper;
 import com.egopulse.vertx.web.RouteRegistrar;
 import com.egopulse.web.annotation.CONNECT;
