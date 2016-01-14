@@ -16,6 +16,7 @@ import com.egopulse.web.annotation.PUT;
 import com.egopulse.web.annotation.Path;
 import com.egopulse.web.annotation.Produce;
 import com.egopulse.web.annotation.ResponseBody;
+import com.egopulse.web.annotation.ResponseNext;
 import com.egopulse.web.annotation.Restful;
 import com.egopulse.web.annotation.RouteMapping;
 import com.egopulse.web.annotation.TRACE;
@@ -34,6 +35,7 @@ class RouteMappingInfo {
     private final int order;
     private final String path;
     private final String pathRegex;
+    private final boolean responseNext;
 
     public RouteMappingInfo(Element element) {
         responseBody = isResponseBody(element);
@@ -44,6 +46,7 @@ class RouteMappingInfo {
         order = extractOrder(element);
         path = extractPath(element);
         pathRegex = extractPathRegEx(element);
+        responseNext = extractResponseEnd(element);
     }
 
     public boolean isResponseBody() {
@@ -76,6 +79,10 @@ class RouteMappingInfo {
 
     public String getPathRegex() {
         return pathRegex;
+    }
+
+    public boolean isResponseNext() {
+        return responseNext;
     }
 
     private static boolean isResponseBody(Element element) {
@@ -129,7 +136,6 @@ class RouteMappingInfo {
             for (ContentType type : produce.type()) {
                 ret.add(type.toString());
             }
-
             Collections.addAll(ret, produce.custom());
         }
         RouteMapping routeMapping = element.getAnnotation(RouteMapping.class);
@@ -200,5 +206,9 @@ class RouteMappingInfo {
             return ordered.value();
         }
         return 0;
+    }
+
+    private static boolean extractResponseEnd(Element element) {
+        return element.getAnnotation(ResponseNext.class) != null;
     }
 }

@@ -181,7 +181,7 @@ class RouteRegistrarCodeGenerator implements Generator {
                 } else {
                     registerMethodBuilder.addStatement("      helper.handleResponse(ctx, $T.class, ret)", erasureMethodType);
                 }
-            } else {
+            } else if (methodRouteMappingInfo.isResponseNext()) {
                 registerMethodBuilder.addStatement("      ctx.next()");
             }
             //End the handler method
