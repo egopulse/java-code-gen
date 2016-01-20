@@ -182,7 +182,7 @@ public class DataObjectProcessor extends AbstractProcessor {
                                     }
                                     String logStr = "Generated model " + model.getFqn() + ": " + relativeName;
                                     log.info(logStr);
-                                    processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, logStr, entry.getKey());
+                                    processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, logStr);
                                 }
                             }
                         }

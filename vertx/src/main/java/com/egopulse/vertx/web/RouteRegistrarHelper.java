@@ -1,6 +1,5 @@
 package com.egopulse.vertx.web;
 
-
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -118,7 +117,7 @@ public interface RouteRegistrarHelper {
         if (ret != null) {
             Single single = null;
             if (ret instanceof Observable) {
-                single = ((Observable) ret).toSingle();
+                single = ((Observable) ret).toList().toSingle();
             } else if (ret instanceof Single) {
                 single = (Single) ret;
             }
