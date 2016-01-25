@@ -59,11 +59,6 @@ public class BeanGenerator implements Generator {
         }
     }
 
-    @Override
-    public void generateLast(Filer filer) throws IOException {
-        // Do nothing
-    }
-
     private TypeSpec genBean(BeanInfo info, String beanName, boolean nonDefaultConstructor, ClassName builderClassName) {
         List<BeanInfo.Property> properties = info.getProperties();
         int propCount = properties.size();

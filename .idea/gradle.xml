@@ -14,6 +14,8 @@
             <option value="$PROJECT_DIR$/bson" />
             <option value="$PROJECT_DIR$/bson-runtime" />
             <option value="$PROJECT_DIR$/common" />
+            <option value="$PROJECT_DIR$/proxy" />
+            <option value="$PROJECT_DIR$/proxy-runtime" />
             <option value="$PROJECT_DIR$/vertx" />
             <option value="$PROJECT_DIR$/web-annotation" />
           </set>
@@ -25,6 +27,8 @@
             <option value="$PROJECT_DIR$/bson" />
             <option value="$PROJECT_DIR$/bson-runtime" />
             <option value="$PROJECT_DIR$/common" />
+            <option value="$PROJECT_DIR$/proxy" />
+            <option value="$PROJECT_DIR$/proxy-runtime" />
             <option value="$PROJECT_DIR$/vertx" />
             <option value="$PROJECT_DIR$/web-annotation" />
           </set>

@@ -239,6 +239,12 @@ public class Models {
                 e);
     }
 
+    public void note(String msg, Object... args) {
+        messager.printMessage(
+                Diagnostic.Kind.NOTE,
+                String.format(msg, args));
+    }
+
     public void error(Element e, Throwable t) {
         StringWriter writer = new StringWriter();
         t.printStackTrace(new PrintWriter(writer));

@@ -7,6 +7,8 @@
       <module fileurl="file://$PROJECT_DIR$/bson-runtime/bson-runtime.iml" filepath="$PROJECT_DIR$/bson-runtime/bson-runtime.iml" />
       <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
       <module fileurl="file://$PROJECT_DIR$/java-code-gen.iml" filepath="$PROJECT_DIR$/java-code-gen.iml" />
+      <module fileurl="file://$PROJECT_DIR$/proxy/proxy.iml" filepath="$PROJECT_DIR$/proxy/proxy.iml" />
+      <module fileurl="file://$PROJECT_DIR$/proxy-runtime/proxy-runtime.iml" filepath="$PROJECT_DIR$/proxy-runtime/proxy-runtime.iml" />
       <module fileurl="file://$PROJECT_DIR$/vertx/vertx.iml" filepath="$PROJECT_DIR$/vertx/vertx.iml" />
       <module fileurl="file://$PROJECT_DIR$/web-annotation/web-annotation.iml" filepath="$PROJECT_DIR$/web-annotation/web-annotation.iml" />
     </modules>

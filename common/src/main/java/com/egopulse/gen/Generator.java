@@ -31,7 +31,8 @@ public interface Generator {
      * @param filer The filer to write files content out
      * @throws IOException When failed to write to files because any reason
      */
-    void generateLast(Filer filer) throws IOException;
+    default void generateLast(Filer filer) throws IOException {
+    }
 
     default void writeServiceNames(Class<?> serviceClass, Filer filer, List<String> generatedClassNames) throws IOException {
         String resourceFile = "META-INF/services/" + serviceClass.getName();
