@@ -49,7 +49,7 @@ public class ProxyCodeGenerator implements Generator {
         PackageElement packageElem = Models.getPackage(typeElem);
         String packageName = packageElem.getQualifiedName().toString();
         String proxiedClassFullName = typeElem.getQualifiedName().toString();
-        String proxiedClassSimpleName = proxiedClassFullName.substring(packageName.length() + 1).replace(".", "@");
+        String proxiedClassSimpleName = proxiedClassFullName.substring(packageName.length() + 1).replace(".", "_");
         String proxyClassSimpleName = proxiedClassSimpleName + "Proxy";
         TypeName proxiedClassTypeName = TypeName.get(typeElem.asType());
         ClassName adviceClassName = ClassName.get(Advice.class);
@@ -145,7 +145,7 @@ public class ProxyCodeGenerator implements Generator {
                 .addSuperinterface(ProxyCreatorRegistrar.class)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addMethod(registerMethod).build());
-        generatedRegistrarClassNames.add(packageName + "." + proxyClassSimpleName + "." + "Registrar");
+        generatedRegistrarClassNames.add(packageName + "." + proxyClassSimpleName + "$Registrar");
         JavaFile.builder(packageName, proxyClassBuilder.build()).build().writeTo(filer);
     }
 
