@@ -20,6 +20,10 @@ public class ProxyGenProcessorTest {
                 .and()
                 .generatesSources(
                         JavaFileObjects.forResource("com/egopulse/proxy/gen/TestBeanProxy.java")
+                )
+                .and()
+                .generatesFiles(
+                        JavaFileObjects.forResource("com/egopulse/proxy/gen/GenProxyCreatorRegistrar")
                 );
     }
 }

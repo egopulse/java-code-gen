@@ -6,6 +6,9 @@ import com.egopulse.gen.Models;
 import com.egopulse.proxy.Advice;
 import com.egopulse.proxy.DefaultProxyTarget;
 import com.egopulse.proxy.Invoker;
+import com.egopulse.proxy.ProxyCreatorRegistrar;
+import com.egopulse.proxy.ProxyCreatorRegistry;
+import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
@@ -23,9 +26,13 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class ProxyCodeGenerator implements Generator {
     private final Models models;
+    private final List<String> generatedRegistrarClassNames = new ArrayList<>();
 
     public ProxyCodeGenerator(Models models) {
         this.models = models;
@@ -39,10 +46,14 @@ public class ProxyCodeGenerator implements Generator {
 
         models.note("Generating Proxy class for %s", typeElem.getQualifiedName().toString());
 
-        String proxiedClassSimpleName = typeElem.getSimpleName().toString();
+        PackageElement packageElem = Models.getPackage(typeElem);
+        String packageName = packageElem.getQualifiedName().toString();
+        String proxiedClassFullName = typeElem.getQualifiedName().toString();
+        String proxiedClassSimpleName = proxiedClassFullName.substring(packageName.length() + 1).replace(".", "@");
         String proxyClassSimpleName = proxiedClassSimpleName + "Proxy";
         TypeName proxiedClassTypeName = TypeName.get(typeElem.asType());
         ClassName adviceClassName = ClassName.get(Advice.class);
+        ClassName proxyClassName = ClassName.get(packageName, proxyClassSimpleName);
 
         TypeSpec.Builder proxyClassBuilder = TypeSpec.classBuilder(proxyClassSimpleName)
                 .addModifiers(Modifier.PUBLIC)
@@ -78,7 +89,8 @@ public class ProxyCodeGenerator implements Generator {
             MethodSpec.Builder methodBuilder = MethodSpec
                     .methodBuilder(methodName)
                     .addModifiers(Modifier.PUBLIC)
-                    .addAnnotation(Override.class);
+                    .addAnnotation(Override.class)
+                    .addAnnotation(AnnotationSpec.builder(SuppressWarnings.class).addMember("value", "\"unchecked\"").build());
             paramListBuilder.setLength(0);
 
 
@@ -123,8 +135,23 @@ public class ProxyCodeGenerator implements Generator {
             proxyClassBuilder.addMethod(methodBuilder.build());
         }
 
-        PackageElement packageElem = Models.getPackage(typeElem);
-        String packageName = packageElem.getQualifiedName().toString();
+        MethodSpec registerMethod = MethodSpec.methodBuilder("register")
+                .addParameter(ProxyCreatorRegistry.class, "registry", Modifier.FINAL)
+                .addModifiers(Modifier.PUBLIC)
+                .addAnnotation(Override.class)
+                .addStatement("registry.register($T.class, $T::new)", proxiedClassTypeName, proxyClassName)
+                .build();
+        proxyClassBuilder.addType(TypeSpec.classBuilder("Registrar")
+                .addSuperinterface(ProxyCreatorRegistrar.class)
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addMethod(registerMethod).build());
+        generatedRegistrarClassNames.add(packageName + "." + proxyClassSimpleName + "." + "Registrar");
         JavaFile.builder(packageName, proxyClassBuilder.build()).build().writeTo(filer);
     }
+
+    @Override
+    public void generateLast(Filer filer) throws IOException {
+        writeServiceNames(ProxyCreatorRegistrar.class, filer, generatedRegistrarClassNames);
+    }
+
 }
