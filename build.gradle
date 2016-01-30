@@ -22,7 +22,7 @@ subprojects {
     apply plugin: 'propdeps-idea'
 
     group = 'com.egopulse.gen'
-    version = '0.1.10'
+    version = '0.1.11'
 
     sourceCompatibility = '1.8'
     targetCompatibility = '1.8'

@@ -21,6 +21,10 @@ public class DefaultProxyRegistry implements ProxyCreatorRegistry {
     @Override
     @SuppressWarnings("unchecked")
     public <T> T create(Class<T> proxiedClass, T proxied, Advice advice) {
-        return (T) store.get(proxiedClass).create(proxied, advice);
+        ProxyCreator creator = store.get(proxiedClass);
+        if (creator != null) {
+            return (T) creator.create(proxied, advice);
+        }
+        return proxied;
     }
 }
