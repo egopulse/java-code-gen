@@ -122,9 +122,22 @@ public class ProxyCodeGenerator implements Generator {
                     methodBuilder.addStatement("$T invoker = () -> this.delegate.$L($L);", invokerClassName, methodName, paramList);
                 }
 
+                StringBuilder fullMethodNameBuilder = new StringBuilder(100);
+                fullMethodNameBuilder.append(method.getSimpleName().toString()).append("(");
+                boolean firstParam = true;
+                for (VariableElement variableElement : method.getParameters()) {
+                    if (firstParam) {
+                        firstParam = false;
+                    } else {
+                        fullMethodNameBuilder.append(",");
+                    }
+                    fullMethodNameBuilder.append(models.getTypeUtils().erasure(variableElement.asType()));
+                }
+                fullMethodNameBuilder.append(")");
+
                 methodBuilder.addStatement("$T proxyTarget = new $T($T.class, this.delegate, $S, invoker$L)",
                         defaultProxyTargetClassName, defaultProxyTargetClassName,
-                        proxiedClassTypeName, method.toString(), paramList.length() == 0 ? "" : ", " + paramList);
+                        proxiedClassTypeName, fullMethodNameBuilder.toString(), paramList.length() == 0 ? "" : ", " + paramList);
 
                 if (isVoidType) {
                     methodBuilder.addStatement("this.advice.execute(proxyTarget)");

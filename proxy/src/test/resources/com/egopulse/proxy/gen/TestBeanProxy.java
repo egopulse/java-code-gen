@@ -9,6 +9,7 @@ import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.SuppressWarnings;
+import java.util.List;
 
 public class TestBeanProxy implements TestBean {
     private final TestBean delegate;
@@ -46,9 +47,9 @@ public class TestBeanProxy implements TestBean {
 
     @Override
     @SuppressWarnings("unchecked")
-    public boolean method3() {
-        Invoker invoker = () -> this.delegate.method3();;
-        DefaultProxyTarget proxyTarget = new DefaultProxyTarget(TestBean.class, this.delegate, "method3()", invoker);
+    public boolean method3(final List<String> param1) {
+        Invoker invoker = () -> this.delegate.method3(param1);;
+        DefaultProxyTarget proxyTarget = new DefaultProxyTarget(TestBean.class, this.delegate, "method3(java.util.List)", invoker, param1);
         return (boolean) this.advice.execute(proxyTarget);
     }
 
