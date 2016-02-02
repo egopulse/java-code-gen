@@ -1,16 +1,16 @@
 package com.egopulse.proxy;
 
 public class DefaultProxyTarget implements ProxyTarget {
-    private Class<?> type;
-    private Object target;
-    private final int methodIndex;
+    private final Class<?> type;
+    private final Object target;
+    private final String methodName;
     private final Object[] paramValues;
     private final Invoker invoker;
 
-    public DefaultProxyTarget(Class<?> type, Object target, int methodIndex, Invoker invoker, Object... paramValues) {
+    public DefaultProxyTarget(Class<?> type, Object target, String methodName, Invoker invoker, Object... paramValues) {
         this.type = type;
         this.target = target;
-        this.methodIndex = methodIndex;
+        this.methodName = methodName;
         this.invoker = invoker;
         this.paramValues = paramValues;
     }
@@ -25,8 +25,8 @@ public class DefaultProxyTarget implements ProxyTarget {
     }
 
     @Override
-    public int getMethodIndex() {
-        return methodIndex;
+    public String getMethodName() {
+        return methodName;
     }
 
     @Override

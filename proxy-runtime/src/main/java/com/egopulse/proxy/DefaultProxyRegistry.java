@@ -19,6 +19,11 @@ public class DefaultProxyRegistry implements ProxyCreatorRegistry {
     }
 
     @Override
+    public boolean isRegistered(Class<?> proxiedClass) {
+        return store.containsKey(proxiedClass);
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public <T> T create(Class<T> proxiedClass, T proxied, Advice advice) {
         ProxyCreator creator = store.get(proxiedClass);

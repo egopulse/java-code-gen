@@ -2,7 +2,7 @@ package com.egopulse.proxy;
 
 public interface ProxyTarget {
     Object getTarget();
-    int getMethodIndex();
+    String getMethodName();
     Object[] getParamValues();
     Object invoke();
 }
