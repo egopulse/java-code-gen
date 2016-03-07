@@ -112,27 +112,6 @@ public interface RouteRegistrarHelper {
         return stringToObject(clazz, ctx.getBodyAsString());
     }
 
-    @SuppressWarnings("unchecked")
-    default <R> void handleResponse(RoutingContext ctx, Class<R> retType, R ret) {
-        if (ret != null) {
-            Single single = null;
-            if (ret instanceof Observable) {
-                single = ((Observable) ret).toList().toSingle();
-            } else if (ret instanceof Single) {
-                single = (Single) ret;
-            }
-            if (single != null) {
-                single.subscribe(
-                        r -> handleSingleResponse(ctx, (Class) r.getClass(), r),
-                        e -> handleError(ctx, (Throwable) e));
-            } else {
-                handleSingleResponse(ctx, retType, ret);
-            }
-        } else {
-            ctx.next();
-        }
-    }
-
     <R> void handleSingleResponse(RoutingContext ctx, Class<R> retType, R ret);
 
     void handleError(RoutingContext ctx, Throwable e);
@@ -161,7 +140,7 @@ public interface RouteRegistrarHelper {
             resp.putHeader("content-type", ctx.getAcceptableContentType());
             Single single = null;
             if (ret instanceof Observable) {
-                single = ((Observable) ret).toSingle();
+                single = ((Observable) ret).toList().toSingle();
             } else if (ret instanceof Single) {
                 single = (Single) ret;
             }
