@@ -1,6 +1,9 @@
+import org.gradle.internal.jvm.Jvm
+
 dependencies {
     compile project(':bean')
     compile project(':bson-runtime')
 
     testCompile "com.google.testing.compile:compile-testing:$googleCompileTestingVesion"
+    testCompile files(Jvm.current().getToolsJar())
 }

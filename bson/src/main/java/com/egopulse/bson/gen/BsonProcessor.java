@@ -5,7 +5,7 @@ import com.egopulse.gen.Models;
 import com.egopulse.gen.TypeModelAnnotationProcessor;
 
 public class BsonProcessor extends TypeModelAnnotationProcessor {
-    protected BsonProcessor() {
+    public BsonProcessor() {
         super(Bson.class);
     }
 

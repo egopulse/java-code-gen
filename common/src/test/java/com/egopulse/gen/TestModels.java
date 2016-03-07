@@ -1,7 +1,8 @@
-package com.egopulse.bson.gen;
+package com.egopulse.gen;
 
-import com.egopulse.gen.Models;
+import com.google.common.truth.Truth;
 import com.google.testing.compile.JavaFileObjects;
+import com.google.testing.compile.JavaSourcesSubjectFactory;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -21,15 +22,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.google.common.truth.Truth.assert_;
-import static com.google.testing.compile.JavaSourcesSubjectFactory.javaSources;
-
 public class TestModels {
 
     @Test
     public void testGenericList() throws Exception
     {
-        assert_().about(javaSources())
+        Truth.assert_().about(JavaSourcesSubjectFactory.javaSources())
                 .that(Collections.singletonList(JavaFileObjects.forResource("com/egopulse/gen/TestGenericList.java")))
                 .processedWith(new TestProcessor((elem, models) -> {
                     List<VariableElement> fields = models.getFields(elem);

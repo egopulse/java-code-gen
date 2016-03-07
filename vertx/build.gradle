@@ -1,3 +1,5 @@
+import org.gradle.internal.jvm.Jvm
+
 dependencies {
     optional project(':common')
     optional "io.vertx:vertx-codegen:$vertxVersion"
@@ -8,6 +10,6 @@ dependencies {
     compile "io.vertx:vertx-core:$vertxVersion"
     compile "io.vertx:vertx-rx-java:$vertxVersion"
 
-
     testCompile "com.google.testing.compile:compile-testing:$googleCompileTestingVesion"
+    testCompile files(Jvm.current().getToolsJar())
 }

@@ -1,4 +1,7 @@
+import org.gradle.internal.jvm.Jvm
+
 dependencies {
     compile project(':common')
     testCompile "com.google.testing.compile:compile-testing:$googleCompileTestingVesion"
+    testCompile files(Jvm.current().getToolsJar())
 }

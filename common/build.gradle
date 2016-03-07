@@ -1,4 +1,7 @@
+import org.gradle.internal.jvm.Jvm
+
 dependencies {
     compile "com.squareup:javapoet:$javaPoetVersion"
     testCompile "com.google.testing.compile:compile-testing:$googleCompileTestingVesion"
+    testCompile files(Jvm.current().getToolsJar())
 }
