@@ -7,6 +7,7 @@ import io.vertx.rxjava.core.buffer.Buffer;
 import io.vertx.rxjava.core.http.HttpServerResponse;
 import io.vertx.rxjava.ext.web.RoutingContext;
 import io.vertx.rxjava.ext.web.sstore.SessionStore;
+import rx.Completable;
 import rx.Observable;
 import rx.Single;
 
@@ -143,6 +144,8 @@ public interface RouteRegistrarHelper {
                 single = ((Observable) ret).toList().toSingle();
             } else if (ret instanceof Single) {
                 single = (Single) ret;
+            } else if (ret instanceof Completable) {
+                single = ((Completable) ret).toSingleDefault("");
             }
             if (single != null) {
                 single.subscribe(
