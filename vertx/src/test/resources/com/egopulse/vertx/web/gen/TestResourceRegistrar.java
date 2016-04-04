@@ -19,7 +19,6 @@ public class TestResourceRegistrar implements RouteRegistrar<TestResource> {
             Route route = router.route();
             route.path("/api/test/:pathParam");
             route.method(HttpMethod.GET);
-            route.method(HttpMethod.POST);
             route.produces("application/json");
             Handler<RoutingContext> handler = ctx -> {
                 try {

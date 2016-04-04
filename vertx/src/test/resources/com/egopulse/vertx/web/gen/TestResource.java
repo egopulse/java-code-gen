@@ -23,7 +23,7 @@ import io.vertx.ext.web.Session;
 @RouteMapping(path = "/api")
 public class TestResource {
 
-    @RouteMapping(path = "/test/:pathParam", method = {HttpMethod.GET, HttpMethod.POST})
+    @RouteMapping(path = "/test/:pathParam", method = HttpMethod.GET)
     public String test(@PathParam String pathParam, @RequestParam int reqParam, @CookieValue boolean cookieValue) {
         return "aaa";
     }

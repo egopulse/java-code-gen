@@ -25,6 +25,7 @@ import javax.lang.model.element.Element;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 class RouteMappingInfo {
     private final boolean responseBody;
@@ -128,8 +129,8 @@ class RouteMappingInfo {
 
     private static Set<String> extractProduces(Element element) {
         Produce produce = element.getAnnotation(Produce.class);
-        Set<String> ret = produce == null ? new HashSet<>() : extractContentTypes(produce.type(),
-                produce.value(), produce.custom());
+        Set<String> ret = produce == null ? new HashSet<>() : extractContentTypes(produce.value(),
+                produce.type(), produce.custom());
         RouteMapping routeMapping = element.getAnnotation(RouteMapping.class);
         if (routeMapping != null) {
             for (ContentType type : routeMapping.produces()) {
@@ -157,8 +158,8 @@ class RouteMappingInfo {
 
     private static Set<String> extractConsumes(Element element) {
         Consume consume = element.getAnnotation(Consume.class);
-        Set<String> ret = consume == null ? new HashSet<>() : extractContentTypes(consume.type(), 
-                consume.value(), consume.custom());
+        Set<String> ret = consume == null ? new HashSet<>() : extractContentTypes(consume.value(), 
+                consume.type(), consume.custom());
         RouteMapping routeMapping = element.getAnnotation(RouteMapping.class);
         if (routeMapping != null) {
             for (ContentType type : routeMapping.consumes()) {
