@@ -37,7 +37,7 @@ class RouteMappingInfo {
     private final String pathRegex;
     private final boolean responseNext;
 
-    public RouteMappingInfo(Element element) {
+    RouteMappingInfo(Element element) {
         responseBody = isResponseBody(element);
         blocking = isBlocking(element);
         produces = extractProduces(element);
@@ -49,39 +49,39 @@ class RouteMappingInfo {
         responseNext = extractResponseEnd(element);
     }
 
-    public boolean isResponseBody() {
+    boolean isResponseBody() {
         return responseBody;
     }
 
-    public boolean isBlocking() {
+    boolean isBlocking() {
         return blocking;
     }
 
-    public Set<String> getProduces() {
+    Set<String> getProduces() {
         return produces;
     }
 
-    public Set<String> getConsumes() {
+    Set<String> getConsumes() {
         return consumes;
     }
 
-    public Set<HttpMethod> getMethods() {
+    Set<HttpMethod> getMethods() {
         return methods;
     }
 
-    public int getOrder() {
+    int getOrder() {
         return order;
     }
 
-    public String getPath() {
+    String getPath() {
         return path;
     }
 
-    public String getPathRegex() {
+    String getPathRegex() {
         return pathRegex;
     }
 
-    public boolean isResponseNext() {
+    boolean isResponseNext() {
         return responseNext;
     }
 
@@ -127,17 +127,9 @@ class RouteMappingInfo {
     }
 
     private static Set<String> extractProduces(Element element) {
-        Set<String> ret = new HashSet<>();
         Produce produce = element.getAnnotation(Produce.class);
-        if (produce != null) {
-            for (ContentType type : produce.value()) {
-                ret.add(type.toString());
-            }
-            for (ContentType type : produce.type()) {
-                ret.add(type.toString());
-            }
-            Collections.addAll(ret, produce.custom());
-        }
+        Set<String> ret = produce == null ? new HashSet<>() : extractContentTypes(produce.type(),
+                produce.value(), produce.custom());
         RouteMapping routeMapping = element.getAnnotation(RouteMapping.class);
         if (routeMapping != null) {
             for (ContentType type : routeMapping.produces()) {
@@ -151,18 +143,22 @@ class RouteMappingInfo {
         return ret;
     }
 
-    private static Set<String> extractConsumes(Element element) {
+    private static Set<String> extractContentTypes(ContentType[] values, ContentType[] types, String[] customs) {
         Set<String> ret = new HashSet<>();
-        Consume consume = element.getAnnotation(Consume.class);
-        if (consume != null) {
-            for (ContentType type : consume.value()) {
-                ret.add(type.toString());
-            }
-            for (ContentType type : consume.type()) {
-                ret.add(type.toString());
-            }
-            Collections.addAll(ret, consume.custom());
+        for (ContentType type : values) {
+            ret.add(type.toString());
         }
+        for (ContentType type : types) {
+            ret.add(type.toString());
+        }
+        Collections.addAll(ret, customs);
+        return ret;
+    }
+
+    private static Set<String> extractConsumes(Element element) {
+        Consume consume = element.getAnnotation(Consume.class);
+        Set<String> ret = consume == null ? new HashSet<>() : extractContentTypes(consume.type(), 
+                consume.value(), consume.custom());
         RouteMapping routeMapping = element.getAnnotation(RouteMapping.class);
         if (routeMapping != null) {
             for (ContentType type : routeMapping.consumes()) {
